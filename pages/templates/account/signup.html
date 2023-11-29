@@ -12,12 +12,6 @@
     </head>
     <body class="d-flex align-items-center">
       <div class="container border rounded p-4 shadow-sm">
-        <!-- When you don't specify an action attribute in your form, the browser submits the form to the current URL. In the case of the login page, the form will be submitted to the URL associated with the LoginView.-->
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-        <button type="submit">Sign Up</button>
-    </form>
         <form>
           <div class="row pb-4">
             <div class="col md-6">
