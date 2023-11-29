@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     # Local apps.
+    'allauth',
+    'allauth.account', # using another table for emails.
     'accounts.apps.AccountsConfig',
 ]
 
@@ -126,3 +129,33 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 """Authentication"""
 AUTH_USER_MODEL = "accounts.CustomUser"
+# Django allauth config.
+SITE_ID = 1
+AUTHENTICATION_BACKENDS = (
+"django.contrib.auth.backends.ModelBackend",
+"allauth.account.auth_backends.AuthenticationBackend", # new
+)
+ACCOUNT_FORMS = {
+    'signup': 'accounts.forms.CustomSignupForm',
+}
+ACCOUNT_USERNAME_REQUIRED = False # While this approach may seem a little hackish in fact it works just fine. Fully removing the username from the custom user model requires the use of AbstractBaseUser116, which is an additional, optional step some developers take. 
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_SESSION_REMEMBER = True # To remove the checkbox of templates/account/login.html
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
+ACCOUNT_CHANGE_EMAIL = False
+
+"""To test email in the console"""
+#DEFAULT_FROM_EMAIL = "admin@django.com"
+#EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" 
+
+"""SMTP SERVER (EMAIL)"""
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = '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'
+DEFAULT_FROM_EMAIL = "pabloernesto8022@gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False

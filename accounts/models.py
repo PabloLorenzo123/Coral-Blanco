@@ -1,5 +1,5 @@
 from django.db import models
-
+import uuid
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -14,6 +14,13 @@ from django.utils import timezone
 class CustomUser(AbstractUser):
 
     id = models.AutoField(primary_key=True)
+    # adding a uuid to avoid compromising the page.
+    uuid = models.UUIDField(
+        default = uuid.uuid4,
+        editable = False,
+        unique = True
+    )
+
     name = models.CharField(max_length=15)
     last_name = models.CharField(max_length=30)
     birthdate = models.DateField(default=timezone.now)
@@ -23,6 +30,7 @@ class CustomUser(AbstractUser):
     country = models.CharField(
         max_length=2,
         choices=COUNTRIES,
+        default="US",
     )
 
     phone_number = models.CharField(
