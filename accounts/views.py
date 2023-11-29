@@ -34,6 +34,15 @@ class UpdateUser(UserPassesTestMixin, generic.UpdateView):
     def test_func(self):
         # Check if the requesting user is the same as the user being updated
         return self.request.user == self.get_object()
+    
+    def form_valid(self, form_class):
+        print("form is valid")
+        return super().form_valid(form_class)
+
+    def form_invalid(self, form_class):
+        print("form invalid")
+        print(form_class.errors)
+        return super().form_invalid(form_class)
 
 class Home(generic.TemplateView):
     template_name = 'home.html'

@@ -30,10 +30,11 @@ class CustomUserChangeForm(UserChangeForm):
             "name",
             "last_name",
             "birthdate",
+            "address",
             "country",
+            "phone_number",
             "city",
             "postcode",
-            "phone_number",
         )
 
 """Allauth"""

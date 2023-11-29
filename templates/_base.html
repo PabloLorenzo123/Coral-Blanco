@@ -1,5 +1,5 @@
 <!-- templates/base.html -->
-<!-- {% load static %} -->
+{% load static %}
 <!DOCTYPE html>
 <html>
     <head>
@@ -21,6 +21,12 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <ul class="navbar-nav me-auto mb-2 mb-md-0">
+<<<<<<< HEAD
+=======
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Sobre</a>
+                        </li>
+>>>>>>> 6d481278a8307d455472b5ccb593c6f494c5c0e4
                         {% if user.is_authenticated %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'account_logout' %}">Log Out</a>

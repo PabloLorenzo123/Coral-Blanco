@@ -1,54 +1,52 @@
-<!DOCTYPE html> 
+{% extends "_base.html" %}
+{% block title %}Iniciar sesión{% endblock title %}
 
-<html>
-    <head>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-        <title>Log In</title>
-    </head>
-
-    <body>
-      <div>
-        <div class="col-md-6">
-          <div class="row">
-            <i class="fas fa-hotel fa-3x" style="color: #709085;"></i>
-            <span class="h1 fw-bold mb-0">  Hotel</span>
-          </div>
-
-          <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Log In</button>
-            </form>
-
-          <div class="row">
-            <form>
-              <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Iniciar Sesión</h3>
-              <div class="form-group mb-4">
-                <label class="form-label" for="form2Example18">Correo Electrónico</label>
-                <input type="email" id="form2Example18" class="form-control form-control-lg" />
-              </div>
-              <div class="form-group mb-4">           
-                <label class="form-label" for="form2Example28">Contraseña</label>
-                <input type="password" id="form2Example28" class="form-control form-control-lg" />
-              </div>
-              <div class="pt-1 mb-4">
-                <button class="btn btn-info btn-lg btn-block" type="button">Login</button>
-              </div>
-              <p class="small mb-5 pb-lg-2"><a class="text-muted" href="#!">¿Olvidó su contraseña?</a></p>
-              <p>No tiene una cuenta? <a href="#!" class="link-info">Registrate aquí</a></p>
-            </form>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <img src="https://a.cdn-hotels.com/gdcs/production163/d388/db5ed03c-2495-4df7-997a-41c985888ca0.jpg"
-          alt="Login image" class="w-100 vh-100" style="object-fit: cover; object-position: left;">
-        </div>
+{% block content %}
+{% if user.is_authenticated %}
+<p>Ya estás ingresado</p>
+{% else %}
+  <div>
+    <div class="col-md-6">
+      <div class="row">
+        <i class="fas fa-hotel fa-3x" style="color: #709085;"></i>
+        <span class="h1 fw-bold mb-0">  Hotel</span>
       </div>
-    </body>
-</html>
->>>>>>> cadd29f14233a9a895c5a9514dbfdaf84d6a7e93
+
+      <div class="row">
+        <form method="post" action="{% url 'account_login' %}">
+          {% csrf_token %}
+          <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Iniciar Sesión</h3>
+
+          <div class="form-group mb-4">
+            <label class="form-label" for="{{form.login.id_for_label}}">Correo Electrónico</label>
+            <input id="{{form.login.id_for_label}}" name="{{form.login.name}}" type="email"  class="form-control form-control-lg"/>
+          </div>
+
+          <div class="form-group mb-4">           
+            <label class="form-label" for="{{form.password.id_for_label}}">Contraseña</label>
+              <input id="{{form.password.id_for_label}}" name="{{form.password.name}}" type="password" class="form-control form-control-lg" />
+          </div>
+
+          <div class="pt-1 mb-4">
+            <button class="btn btn-info btn-lg btn-block" type="submit">Login</button>
+          </div>
+
+          {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+              <strong>Error:</strong> Please correct the following issues and try again.
+                <ul>
+                  {% for field, error_list in form.errors.items %}
+                      {% for error in error_list %}
+                        <li>{{ field|title }}: {{ error }}</li>
+                      {% endfor %}
+                  {% endfor %}
+                </ul>
+            </div>
+          {% endif %}
+          <p class="small mb-5 pb-lg-2"><a class="text-muted" href="{% url 'account_reset_password' %}">¿Olvidó su contraseña?</a></p>
+          <p>No tienes una cuenta? <a href="{% url 'account_signup' %}" class="link-info">Registrate aquí</a></p>
+      </form>
+    </div>
+</div>
+{% endif %}
+{% endblock content %}

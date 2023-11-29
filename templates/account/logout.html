@@ -1,0 +1,9 @@
+{% extends '_base.html' %}
+{% block title %}Cerrar sesión{% endblock title %}
+{% block content %}
+<h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Estas seguro de que quieres cerrar sesión?</h3>
+<form method="post">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">Log Out</button>
+</form>
+{% endblock content %}

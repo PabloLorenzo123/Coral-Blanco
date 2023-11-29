@@ -1,7 +1,100 @@
-<h1>Update Info</h1>
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Bookstore{% endblock title %}</title>
+        <!-- Boostrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
-<form method="post">
-    {% csrf_token %}
-    {{form.as_p}}
-    <button type>Update Info</button>
-</form>
+        <!-- CSS -->
+        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    </head>
+    <body class="d-flex align-items-center">
+      <div class="container border rounded p-4 shadow-sm">
+      <!-- When you don't specify an action attribute in your form, the browser submits the form to the current URL. In the case of the login page, the form will be submitted to the URL associated with the LoginView.-->
+        <form method="post">
+          {% csrf_token %}
+          <div class="row pb-4">
+            <div class="col md-6">
+              <h2>Mi información</h2>
+            </div>
+            <div class="col md-6">
+              <!-- que va aqui ?-->
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group col-md-6">
+              <label for="{{form.name.id_for_label}}">Name *</label>
+              <input id="{{form.name.id_for_label}}" name="{{form.name.name}}" type="{{form.name.field.widget.type}}" class="form-control" value="{{form.name.value}}">
+            </div>
+
+            <div class="form-group col-md-6">
+              <label for="{{form.last_name.id_for_label}}">Surname *</label>
+              <input name="{{form.last_name.name}}" type="{{form.last_name.field.widget.type}}" class="form-control" value="{{form.last_name.value}}">
+            </div>
+          </div>
+  
+          <div class="row">
+            <div class="form-group col md-6">
+              <label for="{{form.birthdate.id_for_label}}">Birthdate *</label>
+              <input id="{{form.birthdate.id_for_label}}" name="{{form.birthdate.name}}" type="{{form.birthdate.field.widget.type}}" class="form-control" value="{{form.birthdate.value}}">
+            </div>
+
+            <div class="form-group col md-6">
+              <label for="{{form.phone_number.id_for_label}}">Telephone</label>
+              <input id="{{form.phone_number.id_for_label}}" name="{{form.phone_number.name}}" type="{{form.phone_number.field.widget.type}}" class="form-control" value="{{form.phone_number.value}}">
+            </div>
+          </div>
+  
+          <div class="row">
+            <div class="form-group col md-6">
+              <label for="{{form.address.id_for_label}}">Address * {Street, floor, letter, etc.}</label>
+              <input id="{{form.address.id_for_label}}" name="{{form.address.name}}" type="{{form.address.field.widget.type}}" class="form-control" value="{{form.address.value}}">
+            </div>
+
+            <div class="form-group col md-6">
+              <label for="{{form.postcode.id_for_label}}">Postcode *</label>
+              <input id="{{form.postcode.id_for_label}}" name="{{form.postcode.name}}" type="{{form.postcode.type}}" class="form-control" value="{{form.postcode.value}}">
+            </div>
+          </div>
+  
+          <div class="row">
+            <div class="form-group col md-6">
+              <label for="{{form.city.id_for_label}}">Ciudad</label>
+              <input id="{{form.city.id_for_label}}" name="{{form.city.name}}" type="{{form.city.type}}" class="form-control" value="{{form.city.value}}">
+            </div>
+
+            <div class="form-group col md-6">
+              <label for="{{form.country.id_for_label}}">Country of residence</label>
+              <input id="{{form.country.id_for_label}}" name="{{form.country.name}}" type="{{form.country.type}}" class="form-control" value="{{form.country.value}}">
+            </div>
+          </div>
+  
+          <div class="row" style="margin-bottom: 10px;"> 
+            <div class="form-group col md-6">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col md-6 text-left">
+              <button type="submit" class="btn btn-success btn-lg">Submit</button>
+            </div>
+          </div>
+          {% if form.errors %}
+          <div class="alert alert-danger mt-3">
+              <strong>Error:</strong> Please correct the following issues and try again.
+              <ul>
+                  {% for field, error_list in form.errors.items %}
+                      {% for error in error_list %}
+                          <li>{{ field|title }}: {{ error }}</li>
+                      {% endfor %}
+                  {% endfor %}
+              </ul>
+          </div>
+        {% endif %}
+        </form>
+      </div>
+    </body>
+</html>
