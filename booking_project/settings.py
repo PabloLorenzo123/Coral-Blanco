@@ -38,10 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    # Local apps.
+    # Local
+    'accounts.apps.AccountsConfig',
+    'booking.apps.BookingConfig',
+    # Third party apps.
     'allauth',
     'allauth.account', # using another table for emails.
-    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -161,3 +163,10 @@ EMAIL_HOST_PASSWORD = 'SG.OFg2P4N3QSOeDjV0sDJYXg.5q2IlXRzjVnM3fNC2I9t77gT73aji5k
 DEFAULT_FROM_EMAIL = "pabloernesto8022@gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+
+"""Images/Files upload"""
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
