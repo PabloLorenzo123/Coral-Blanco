@@ -1,0 +1,6 @@
+<h1>Home</h1>
+{% if user.is_authenticated %}
+<p>Hello {{ user.name }}</p>
+<p>{{ user.uuid}}</p>
+<a href="{% url 'update_user' user.uuid %}">Update info</a>
+{% endif %}

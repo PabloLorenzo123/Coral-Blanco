@@ -146,6 +146,8 @@ ACCOUNT_SESSION_REMEMBER = True # To remove the checkbox of templates/account/lo
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
 ACCOUNT_CHANGE_EMAIL = False
 
+ACCOUNT_SIGNUP_REDIRECT_URL = 'update_user'
+
 """To test email in the console"""
 #DEFAULT_FROM_EMAIL = "admin@django.com"
 #EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend" 
