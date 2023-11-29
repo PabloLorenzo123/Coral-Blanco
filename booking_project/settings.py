@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    # Third party.
+    "crispy_forms",
+    "crispy_bootstrap5",
     # Local apps.
     'allauth',
     'allauth.account', # using another table for emails.
@@ -127,7 +130,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-"""Authentication"""
+"""Authentication and Allauth"""
 AUTH_USER_MODEL = "accounts.CustomUser"
 # Django allauth config.
 SITE_ID = 1
@@ -161,3 +164,7 @@ EMAIL_HOST_PASSWORD = 'SG.OFg2P4N3QSOeDjV0sDJYXg.5q2IlXRzjVnM3fNC2I9t77gT73aji5k
 DEFAULT_FROM_EMAIL = "pabloernesto8022@gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+
+"""Crispy forms and bootstrap"""
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
