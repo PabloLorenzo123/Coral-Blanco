@@ -38,13 +38,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    # Local
+    'accounts.apps.AccountsConfig',
+    'booking.apps.BookingConfig',
+    # Third party apps.
     # Third party.
     "crispy_forms",
     "crispy_bootstrap5",
     # Local apps.
     'allauth',
     'allauth.account', # using another table for emails.
-    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -165,6 +168,12 @@ DEFAULT_FROM_EMAIL = "pabloernesto8022@gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
+
+"""Images/Files upload"""
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 """Crispy forms and bootstrap"""
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"

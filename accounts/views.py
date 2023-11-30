@@ -43,6 +43,3 @@ class UpdateUser(UserPassesTestMixin, generic.UpdateView):
         print("form invalid")
         print(form_class.errors)
         return super().form_invalid(form_class)
-
-class Home(generic.TemplateView):
-    template_name = 'home.html'
