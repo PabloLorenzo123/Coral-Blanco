@@ -3,6 +3,7 @@
 {% block title %}Hotel{% endblock title %}
 
 {% block content %}
+<<<<<<< HEAD
     <div class="p-4">
         <div class="jumbotron">
             <h1 class="display-4">Hotel</h1>
@@ -13,6 +14,72 @@
             <p class="lead">
                 <a class="btn btn-primary btn-lg" href="{% url 'search' %}" role="button">Habitaciones</a>
             </p>
+=======
+<!-- Room searchbar -->
+    <form class="row bg-light p-2" action="{% url 'search_room' %}" method="get">
+        <div class="row">
+            <!--Dates-->
+            <div class="col input-group">
+                <input name="check_in_date" type="date" class="form-control">
+                <input name="check_out_date" type="date" class="form-control">
+            </div>
+            
+            <div class="col">
+                <!--Rooms-->
+                <div class="row">
+                    <div class="col input-group">
+                        <i class="fas fa-bed input-group-text"></i>
+                        <select name="number_of_rooms" class="form-select" >
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                    <!-- adults -->
+                    <div class="col input-group">
+                        <i class="fas fa-user-friends input-group-text"></i>
+                        <select name="adults" class="form-select" >
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                            <option value="4">Four</option>
+                            <option value="5">Five</option>
+                        </select>
+                    </div>
+                    <!--Children-->
+                    <div class="col input-group">
+                        <i class="fas fa-user-friends input-group-text"></i>
+                        <select name="children" class="form-select">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                            <option value="4">Four</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col input-group">
+                <button class="btn btn-success">Search</button>
+            </div>
+        </div>
+    </form>     
+<!-- End of room search bar -->
+    <div class="row row-cols-2 row-cols-md-3 g-4 p-5">
+        {% for type in room_types %}
+        <div class="col">
+            <div class="card">
+                <img src="{{ type.images.all.0.image.url }}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">{{ type.type }}</h5>
+                    <p class="card-text">{{ type.short_description }}</p>
+                    <button class="btn btn-outline-primary ml-2 btn-lg" >Reservar</button>
+                    <a href="{% url 'room_detail' type.uuid %}">Info</a>
+                </div>
+            </div>
+>>>>>>> 892cca7d9695589bc4e01d7e7b15b36cecf596b7
         </div>
     </div>
 {% endblock content %}

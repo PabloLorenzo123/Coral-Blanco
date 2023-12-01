@@ -3,22 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from allauth.account.forms import SignupForm
 
-class CustomUserCreationForm(UserCreationForm):
-    birthdate = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date'}),
-        required=False  # Adjust as needed
-    )
-
-    class Meta:
-        model = get_user_model()
-        fields = (
-            "email",
-            "name",
-            "last_name",
-            "birthdate",
-            "country",
-        )
-
+#THIS FORM IS USED.
 class CustomUserChangeForm(UserChangeForm):
     birthdate = forms.DateField(
         widget=forms.DateInput(attrs={'type': 'date'}),
@@ -50,3 +35,20 @@ class CustomSignupForm(SignupForm):
     class Meta:
         model = get_user_model()
         fields = ('email', 'name', 'last_name', 'birthdate', 'country', 'password1', 'password2')
+
+# THIS FORM IS NOT USED.
+class CustomUserCreationForm(UserCreationForm):
+    birthdate = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        required=False  # Adjust as needed
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = (
+            "email",
+            "name",
+            "last_name",
+            "birthdate",
+            "country",
+        )

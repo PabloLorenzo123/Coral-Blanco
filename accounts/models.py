@@ -27,6 +27,8 @@ class CustomUser(AbstractUser):
     address = models.CharField(max_length=100, default="none")
     city = models.CharField(max_length=50, default="none")
 
+    stays = models.IntegerField(default=0)
+    
     country = models.CharField(
         max_length=2,
         choices=COUNTRIES,
@@ -50,3 +52,4 @@ class CustomUser(AbstractUser):
         max_length=10,
         null=True,
     )
+
