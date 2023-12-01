@@ -3,49 +3,16 @@
 {% block title %}Hotel{% endblock title %}
 
 {% block content %}
-    <div class="row row-cols-2 row-cols-md-3 g-4 p-5">
-        {% for type in room_types %}
-        <div class="col">
-            <div class="card">
-                <img src="{{ type.images.all.0.image.url }}" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">{{ type.type }}</h5>
-                    <p class="card-text">{{ type.short_description }}</p>
-                    <button class="btn btn-outline-primary ml-2 btn-lg" >Reservar</button>
-                    <a href="{% url 'room_detail' type.uuid %}">Info</a>
-                </div>
-            </div>
+    <div class="p-4">
+        <div class="jumbotron">
+            <h1 class="display-4">Hotel</h1>
+            <p class="lead">El <b>Hotel</b> es uno de los mejores hoteles en Punta Cana, ideal para disfrutar del sol, de la brisa del Caribe y de la belleza de un mar con arrecifes de coral y aguas cristalinas.</p>
+            <hr class="my-4">
+            <p>Ubicado a lo largo de una de las 10 mejores playas por National Geographic y Tripadvisor, este hotel 5 estrellas todo incluido en Punta Cana ofrece unas vacaciones de ensueño en su B-room con vistas, la mejor tecnología y detalles de lujo.
+            </p>
+            <p class="lead">
+                <a class="btn btn-primary btn-lg" href="{% url 'search' %}" role="button">Habitaciones</a>
+            </p>
         </div>
-        {% endfor %}
     </div>
-    <!-- 
-    {% for type in room_types %}
-        <div class="card mb-3" style="max-width: 540px;">
-            <div class="row g-0">
-                <div class="col-md-4">
-                    <img src="{{ type.images.all.0.image.url }}" class="img-fluid rounded-start" alt="...">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ type.type }}</h5>
-                        <p class="card-text">{{ type.description }}</p>
-                        <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
-
-  
-    <div class="card-group">
-        {% for room in room_types %}
-        <div class="card" style="width: 18rem;">
-            <img class="card-img-top" src="{{ room.images.all.0.image.url }}" alt="{{ room.images.all.0.alt }}">
-            <div class="card-body">
-                <p class="card-text">{{ room.description }}</p>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    -->
 {% endblock content %}

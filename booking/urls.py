@@ -1,7 +1,8 @@
 from django.urls import path
 
-from .views import RoomDetailView
+from .views import RoomDetailView, SearchPageView
 
 urlpatterns = [
-    path('<uuid:pk>', RoomDetailView.as_view(), name='room_detail'),
+    path('search/', SearchPageView.as_view(), name='search'),
+    path('room_details/<uuid:uuid>', RoomDetailView.as_view(), name='room_detail'),
 ]

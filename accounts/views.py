@@ -12,6 +12,7 @@ class UpdateUser(UserPassesTestMixin, generic.UpdateView):
     form_class = CustomUserChangeForm
     model = CustomUser
     template_name = "account/local/update_user.html"
+    
 
     def get_object(self):
         # UpdateUser view is expecting a primary key (pk) or slug in the URL, but it's not receiving it.
@@ -43,6 +44,8 @@ class UpdateUser(UserPassesTestMixin, generic.UpdateView):
         print("form invalid")
         print(form_class.errors)
         return super().form_invalid(form_class)
+    
+    
 
 class Home(generic.TemplateView):
     template_name = 'home.html'
