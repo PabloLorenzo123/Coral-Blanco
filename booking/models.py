@@ -48,7 +48,7 @@ class Room(models.Model):
     )
 
     def __str__(self):
-        return self.number
+        return str(self.number)
     
 class Image(models.Model):
     uuid = models.UUIDField(
@@ -91,6 +91,7 @@ class ReservationCart(models.Model):
 
 class RoomReserved(models.Model):
     id = models.AutoField(primary_key=True)
+    
     room = models.ForeignKey(
         Room, on_delete = models.CASCADE,
     ) # with this we can know the type, and price.
@@ -104,3 +105,6 @@ class RoomReserved(models.Model):
         ReservationCart, on_delete=models.CASCADE,
         related_name='room_reserved',
     )
+    
+    check_in_date = models.DateField(null=True)
+    check_out_date = models.DateField(null=True) # remember to add null false.

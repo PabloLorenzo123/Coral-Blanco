@@ -6,38 +6,45 @@
 <!-- Room searchbar -->
     <form class="row bg-light p-2" action="{% url 'search_room' %}" method="get">
         <div class="row">
+            <!--Dates-->
             <div class="col input-group">
-                <input type="date" class="form-control">
-                <input type="date" class="form-control">
+                <input name="check_in_date" type="date" class="form-control">
+                <input name="check_out_date" type="date" class="form-control">
             </div>
+            
             <div class="col">
+                <!--Rooms-->
                 <div class="row">
                     <div class="col input-group">
                         <i class="fas fa-bed input-group-text"></i>
-                        <select class="form-select" name="rooms">
+                        <select name="number_of_rooms" class="form-select" >
                             <option selected>Open this select menu</option>
                             <option value="1">One</option>
                             <option value="2">Two</option>
                             <option value="3">Three</option>
                         </select>
                     </div>
-
+                    <!-- adults -->
                     <div class="col input-group">
                         <i class="fas fa-user-friends input-group-text"></i>
-                        <select class="form-select" name="adults">
+                        <select name="adults" class="form-select" >
                             <option selected>Open this select menu</option>
                             <option value="1">One</option>
                             <option value="2">Two</option>
                             <option value="3">Three</option>
+                            <option value="4">Four</option>
+                            <option value="5">Five</option>
                         </select>
                     </div>
+                    <!--Children-->
                     <div class="col input-group">
                         <i class="fas fa-user-friends input-group-text"></i>
-                        <select class="form-select" name="children">
+                        <select name="children" class="form-select">
                             <option selected>Open this select menu</option>
                             <option value="1">One</option>
                             <option value="2">Two</option>
                             <option value="3">Three</option>
+                            <option value="4">Four</option>
                         </select>
                     </div>
                 </div>
@@ -47,7 +54,7 @@
             </div>
         </div>
     </form>     
-
+<!-- End of room search bar -->
     <div class="row row-cols-2 row-cols-md-3 g-4 p-5">
         {% for type in room_types %}
         <div class="col">

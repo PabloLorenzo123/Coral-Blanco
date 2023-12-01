@@ -16,7 +16,7 @@
 
           <!-- Dirección de email -->
           <div class="form-group mb-4">
-            <input placeholder="Dirección de email" id="{{form.login.id_for_label}}" name="{{form.login.name}}" type="email"  class="form-control form-control-lg"/>
+            <input placeholder="Dirección de email" id="{{form.email.id_for_label}}" name="{{form.email.name}}" type="email"  class="form-control form-control-lg"/>
           </div>
           <!-- Nombre -->
           <div class="form-group mb-4">
@@ -28,11 +28,15 @@
           </div>
           <!--Fecha de Nacimiento-->
           <div class="form-group mb-4">
-            <input placeholder="Fecha de Nacimiento" id="{{form.birthdate.id_for_label}}" name="{{form.birthdate.name}}" type="{{form.birthdate.field.widget.type}}"  class="form-control form-control-lg"/>
+            <input placeholder="Fecha de Nacimiento" id="{{form.birthdate.id_for_label}}" name="{{form.birthdate.name}}" type="date"  class="form-control form-control-lg"/>
+          </div>
+           <!--Pais-->
+           <div class="form-group mb-4">
+            <input placeholder="País" id="{{form.country.id_for_label}}" name="{{form.country.name}}" type="{{form.country.field.widget.type}}"  class="form-control form-control-lg"/>
           </div>
           <!--Contraseña-->
           <div class="form-group mb-4">           
-              <input placeholder="Contraseña" id="{{form.password.id_for_label}}" name="{{form.password.name}}" type="password" class="form-control form-control-lg" />
+              <input placeholder="Contraseña" id="{{form.password1.id_for_label}}" name="{{form.password1.name}}" type="password" class="form-control form-control-lg" />
           </div>
 
           <div class="pt-1 mb-4">
