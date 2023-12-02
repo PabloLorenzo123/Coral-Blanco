@@ -6,6 +6,28 @@ from accounts.models import CustomUser
 
 
 """Room and Images"""
+class Room(models.Model):
+    room_id = models.AutoField(primary_key=True)
+
+    uuid = models.UUIDField(
+        default = uuid.uuid4,
+        editable = False,
+        unique = True
+    )
+    number = models.IntegerField(null=False) # Number identifies floor.
+    building = models.IntegerField(default=1)
+
+    avaliability = models.BooleanField(default=True)
+
+    type = models.ForeignKey(
+        RoomType,
+        on_delete=models.CASCADE,
+        related_name="room_type",
+    )
+
+    def __str__(self):
+        return str(self.number)
+
 class RoomType(models.Model):
     room_type_id = models.AutoField(primary_key=True) # to save space with foreign keys.
 
@@ -27,30 +49,14 @@ class RoomType(models.Model):
 
     def __str__(self):
         return self.type
-
-
-class Room(models.Model):
-    room_id = models.AutoField(primary_key=True)
-
-    uuid = models.UUIDField(
-        default = uuid.uuid4,
-        editable = False,
-        unique = True
-    )
-    number = models.IntegerField(null=False) # Number identifies floor.
-    building = models.IntegerField(default=1)
-
-    avaibility = models.BooleanField(default=True)
-    type = models.ForeignKey(
-        RoomType,
-        on_delete=models.CASCADE,
-        related_name="room_type",
-    )
-
-    def __str__(self):
-        return str(self.number)
     
 class Image(models.Model):
+    room_type = models.ForeignKey(
+        RoomType,
+        related_name="images",
+        on_delete=models.CASCADE,
+    )
+
     uuid = models.UUIDField(
         default = uuid.uuid4,
         editable = False,
@@ -58,12 +64,6 @@ class Image(models.Model):
     )
     image = models.ImageField(upload_to='rooms/', blank=True)
     alt = models.CharField(max_length=255)
-
-    room_type = models.ForeignKey(
-        RoomType,
-        related_name="images",
-        on_delete=models.CASCADE,
-    )
 
     def __str__(self):
         return self.alt
@@ -74,6 +74,8 @@ class Image(models.Model):
 # We can do this checking before making the search check if the user has a cart if he doesnt create one then.
 # When user clicks search if he has already a cart we delete it, then create one.
 # If he doesnt have a cart we create one, with a unique identifier which could be the reservation number.
+
+"""ReservationCart means the cart of a reservation that is in progress but has not been paid or confirmed"""
 class ReservationCart(models.Model):
     id = models.AutoField(primary_key=True)
 
@@ -89,7 +91,8 @@ class ReservationCart(models.Model):
     check_out_date = models.DateField(null=False)
     # This way the user can acces its cart with user.cart.
 
-class RoomReserved(models.Model):
+"""Room Reservations refers to the tables that contain all the reservations that have been made to a room."""
+class RoomReservations(models.Model):
     id = models.AutoField(primary_key=True)
     
     room = models.ForeignKey(

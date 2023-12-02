@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.views import generic
 from django.db.models import Q
-from .views_helper import RoomResult
+from .views_helper import RoomSearch
 
-from .models import RoomType, Room, ReservationCart, RoomReserved
+from .models import RoomType, Room, ReservationCart, RoomReservations
 
 # Create your views here.
 class RoomDetailView(generic.DetailView):
@@ -33,53 +33,36 @@ def search_room(request):
     print("Just created a new cart for this user!")
 
     # Now find what type of rooms can have this many guests, and if they are available.
-    available_room_types = {'room_type_objects': RoomType.objects.all(), 'prueba': 'no disponible'} 
+    available_room_types = {'room_types': []} 
 
     for room_type in RoomType.objects.all():
+
         if room_type.max_adults >= r_adults and room_type.max_children >= r_children:
-            room_type_applies = 'True' # this means that this type of room can fit this many people.
-            room_type_available = 'False' # This is to check if there are rooms available for this type.
+            room_type_fits = True # this means that this type of room can fit this many people.
+            room_type_available = False # This is to check if there are rooms available for this type.
 
             # We now need to check, if there rooms available for this type of room.
             available_rooms = Room.objects.filter(
                 type = room_type,
             ).exclude(
-                room_id__in = RoomReserved.objects.filter(
+                room_id__in = RoomReservations.objects.filter(
                     Q(check_out_date__gt=r_check_in_date) & Q(check_in_date__lt=r_check_out_date))
                     .values('room_id')
             )
-
+            # If there is room available for this type.
             if len(available_rooms) > 0:
-                room_type_available = 'True'
+                room_type_available = True
             
             # If the type applies for the amount of people, and it's available show in the listview as normal.
             # If the room type apllies for the amount of people, but there are not rooms available, show 'habitación no disponible'
-            available_room_types[str(room_type).rstrip('.')] = {'fits': room_type_applies, 'available': room_type_available}
+            available_room_types['room_types'].append(
+                RoomSearch(room_type_object=room_type, room_fits=room_type_fits, room_is_available=room_type_available)
+            )
         else:
             # If the amount of people exceds the capicity, then show 'No se puede seleccionar esta habitación porque excede la capacidad permitida'.
-            available_room_types[str(room_type).rstrip('.')] = 'no disponible'
-    
-    print('available rooms = ' + str(available_room_types))
+            available_room_types['room_types'].append(
+                RoomSearch(room_type_object=room_type, room_fits=False, room_is_available=False)
+            )
 
     # This return will send to the template a dictionary which have the [RoomTypeObject, it_fits?, RoomAvailable]
     return render(request, 'booking/search_results.html', available_room_types)
-
-
-
-    # Check if the types available
-    # First know what types of room, can every room get. for example 1 guest can fit in all rooms.
-    # Second look through each type of room and find what rooms are free from x day to y day.
-        # Select * FROM Rooms
-        # WHERE type = current_type
-        # AND room_id NOT IN (
-        # SELECT room_id FROM reservations
-        # WHERE check_out_date > 'desired_check_in_date'
-        # AND check_in_date < 'desired_check_out_date' )
-        # if rooms_found > 0:
-            # then dict['room_type'] = True
-        # show in webpage all the room types available.
-        # when the user chooses one room, then save it to the reservation cart.
-        # ask if wanna book another room.
-           # if so repeat the cycle.
-        # else
-         # go to checkout.

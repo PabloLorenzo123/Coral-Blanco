@@ -3,24 +3,11 @@
 
 {% block content %}
 
-{% for roomtype in room_type_objects %}
-    <h1>{{roomtype}}</h1>
+{% for room in room_types %}
+    <h1>{{room.room_type_object}}</h1>
+    {% if not room.room_can_be_selected %}
+        <p>{{room.status}}</p>
+    {% endif %}
 
-    {% with roomtype_key=roomtype|lower %}
-    <p>{{Doble}}</p>
-        {% if available_rooms.roomtype_key.fits and available_rooms.roomtype_key.available %}
-            <!-- Muestra la imagen de la habitacion a color, y que tenga la opcion de reservar-->
-            <p>Disponible</p>
-        {% elif available_rooms.roomtype_key.fits and available_rooms.roomtype_key.available == False %}
-            <!--Muestra la habitacion a color, pero que no se pueda reservar-->
-            <p>Está habitacion no se encuentra disponible</p>
-
-        {% elif available_rooms.roomtype_key.fits == False %}
-            <!-- Muestra la imagen de la habitacion gris, pero que no se pueda reservar-->
-            <p>No se puede reservar esta habitación ya que excede el limite de
-            huéspedes de {{roomtype.max_adults}} adultos y {{roomtype.max_children}} niÑos</p>
-        {% endif %}
-    {% endwith %}
 {% endfor %}
-
 {% endblock content %}
