@@ -74,6 +74,6 @@ def search_room(request):
             available_room_types['room_types'].append(
                 RoomSearch(room_type_object=room_type, room_fits=False, room_is_available=False)
             )
-
+    print(available_room_types['room_types'])
     # This return will send to the template a dictionary which have the [RoomTypeObject, it_fits?, RoomAvailable]
     return render(request, 'booking/search_results.html', available_room_types)

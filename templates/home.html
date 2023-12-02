@@ -3,6 +3,62 @@
 {% block title %}Hotel{% endblock title %}
 
 {% block content %}
+<<<<<<< HEAD
+=======
+<!-- Room searchbar -->
+    <form class="row bg-light p-2" action="{% url 'search_room' %}" method="get">
+        <div class="row">
+            <!--Dates-->
+            <div class="col input-group">
+                <input name="check_in_date" type="date" class="form-control">
+                <input name="check_out_date" type="date" class="form-control">
+            </div>
+            
+            <div class="col">
+                <!--Rooms-->
+                <div class="row">
+                    <div class="col input-group">
+                        <i class="fas fa-bed input-group-text"></i>
+                        <select name="number_of_rooms" class="form-select" >
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                    <!-- adults -->
+                    <div class="col input-group">
+                        <i class="fas fa-user-friends input-group-text"></i>
+                        <select name="adults" class="form-select" >
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                            <option value="4">Four</option>
+                            <option value="5">Five</option>
+                        </select>
+                    </div>
+                    <!--Children-->
+                    <div class="col input-group">
+                        <i class="fas fa-user-friends input-group-text"></i>
+                        <select name="children" class="form-select">
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                            <option value="4">Four</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col input-group">
+                <button class="btn btn-success">Search</button>
+            </div>
+        </div>
+    </form>     
+<!-- End of room search bar -->
+
+>>>>>>> d244ad8be474d037bedfd5ba1142b29fa33b2a73
     <div class="p-4">
         <div class="jumbotron">
             <h1 class="display-4">Hotel</h1>
@@ -11,8 +67,13 @@
             <p>Ubicado a lo largo de una de las 10 mejores playas por National Geographic y Tripadvisor, este hotel 5 estrellas todo incluido en Punta Cana ofrece unas vacaciones de ensueño en su B-room con vistas, la mejor tecnología y detalles de lujo.
             </p>
             <p class="lead">
+<<<<<<< HEAD
                 <a class="btn btn-primary btn-lg" href="{% url 'rooms' %}" role="button">Habitaciones</a>
             </p>
         </div>
+=======
+                <a class="btn btn-primary btn-lg" href="#" role="button">Habitaciones</a>
+            </p>
+>>>>>>> d244ad8be474d037bedfd5ba1142b29fa33b2a73
     </div>
 {% endblock content %}

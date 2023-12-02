@@ -1,6 +1,6 @@
 {% extends '_base.html' %}
 
-{% block title %}{{ room_type.type }}{% endblock title %}
+{% block title %}{{ room.type }}{% endblock title %}
 
 {% block content %} 
     <div class="pt-4">
@@ -16,6 +16,7 @@
                         <p>{{ room.description }}</p>
                     </div>
                 </div>
+                
                 <!-- Right column -->
                 <div class="col-md-6 p-4">
                     <div class="gallery">
@@ -24,7 +25,7 @@
                             <ul class="carousel-indicators">
                                 <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
                                 {% for image in room.images.all %}
-                                    {% if not forloop.first  and not forloop.last %}
+                                    {% if not forloop.first and not forloop.last %}
                                         <li data-target="#myCarousel" data-slide-to="{{ forloop.counter }}"></li>
                                     {% endif %}
                                 {% endfor %}

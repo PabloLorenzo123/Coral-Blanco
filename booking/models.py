@@ -3,6 +3,13 @@ import uuid
 from accounts.models import CustomUser
 
 # Create your models here.
+<<<<<<< HEAD
+class RoomType(models.Model):
+    room_type_id = models.AutoField(primary_key=True) # to save space with foreign keys.
+=======
+
+
+"""Room and Images"""
 class RoomType(models.Model):
     room_type_id = models.AutoField(primary_key=True) # to save space with foreign keys.
 
@@ -24,6 +31,31 @@ class RoomType(models.Model):
 
     def __str__(self):
         return self.type
+
+class Room(models.Model):
+    room_id = models.AutoField(primary_key=True)
+
+    uuid = models.UUIDField(
+        default = uuid.uuid4,
+        editable = False,
+        unique = True
+    )
+    number = models.IntegerField(null=False) # Number identifies floor.
+    building = models.IntegerField(default=1)
+
+    avaliability = models.BooleanField(default=True)
+
+    type = models.ForeignKey(
+        RoomType,
+        on_delete=models.CASCADE,
+        related_name="room_type",
+    )
+
+    def __str__(self):
+        return str(self.number)
+
+>>>>>>> d244ad8be474d037bedfd5ba1142b29fa33b2a73
+
     
 class Image(models.Model):
     room_type = models.ForeignKey(
@@ -77,7 +109,7 @@ class Room(models.Model):
 class ReservationCart(models.Model):
     id = models.AutoField(primary_key=True)
 
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE,
         related_name="cart",
         unique=True,
