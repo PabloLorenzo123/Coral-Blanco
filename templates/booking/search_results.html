@@ -1,0 +1,13 @@
+{% extends '_base.html '%}
+{% block title %}Resultados de busqueda{% endblock title %}
+
+{% block content %}
+
+{% for room in room_types %}
+    <h1>{{room.room_type_object}}</h1>
+    {% if not room.room_can_be_selected %}
+        <p>{{room.status}}</p>
+    {% endif %}
+
+{% endfor %}
+{% endblock content %}
