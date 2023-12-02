@@ -3,9 +3,12 @@ from django.views.generic import DetailView, ListView
 from django.views import generic
 from django.db.models import Q
 from django.http import HttpResponse
+from django.urls import reverse, reverse_lazy
 
-from .models import RoomType, Room, ReservationCart, RoomReservations
-from .views_helper import RoomSearch, delete_user_cart_if_exists, reset_user_cart_if_exists, find_available_rooms
+from .models import RoomType, Room, ReservationCart, RoomReservations, Guest
+from .forms import GuestForm
+from .views_helper import RoomSearch, delete_user_cart_if_exists, find_available_rooms
+
 # Create your views here.
 class RoomDetailView(generic.DetailView):
     model = RoomType
@@ -57,50 +60,46 @@ def search_room(request):
             available_room_types['room_types'].append(
                 RoomSearch(room_type_object=room_type, room_fits=False, room_is_available=False)
             )
-    print(available_room_types['room_types'])
-    # This return will send to the template a dictionary which have the [RoomTypeObject, it_fits?, RoomAvailable]
+
+    # This return will send to the template a dictionary which of objects which have the type of room, and if their avaliability.
     return render(request, 'booking/search_results.html', available_room_types)
 
 def reservate_now(request):
     # This is a post request, to add a room to the user's cart.
     # User needs to be logged in, and have a cart.
     user_cart_query = ReservationCart.objects.filter(user=request.user)
-    user_cart = user_cart_query[0] # because filter returns a queryset and not an object.
 
     if not user_cart_query.exists():
         # redirect to home.
         print("User doesn't have a cart")
         return
     
-    # Lets see if there is a room in there already, if he does reset the cart.
-    # This way if he goes back to the page, his choice still remains.
-    # If he choses another room then the previous one will be erased, and the other one will be added.
-    reset_user_cart_if_exists(request)
-    
+    user_cart = user_cart_query[0] # because filter returns a queryset and not an object.
 
-    # 2. Find an available room of the type requested, and set space_taken = True, and add the room to the cart.
+    # 2. Set room_type of cart to be equal the one requested.
     room_type_name = request.POST.get('room_type_to_reservate')
-
     room_type = RoomType.objects.filter(type=room_type_name)[0] # We do this to get the object of the class.
-    r_check_in_date = user_cart.check_in_date
-    r_check_out_date = user_cart.check_out_date
-    # Find available room, and set space_taken = true to the first one found.
-    available_rooms = find_available_rooms(room_type, r_check_in_date, r_check_out_date)
-    # Check if there is room available.
-    room_available = len(available_rooms) > 0 # This a boolean value.
 
-    print(available_rooms)
+    user_cart.room_type = room_type
+    user_cart.save()
 
-    # Now we need to assign a room to his/her cart.
-    if room_available:
-        reserved_room = available_rooms[0]
-        reserved_room.space_taken = True
+    print(user_cart.room_type)
 
-        reserved_room.save()
+    #3. Now we have to calculate the total price.
+    user_cart.nights = (user_cart.check_out_date - user_cart.check_in_date).days - 1
+    user_cart.reservation_price = float(user_cart.nights * user_cart.room_type.price)
+    user_cart.taxes = float(user_cart.reservation_price) * 0.20 # HERE DEFINE A TAXES CALCULATOR!
+    user_cart.total_price = user_cart.reservation_price + user_cart.taxes
+    user_cart.save()
 
-        user_cart.room = reserved_room
-        user_cart.save()
+    context = {
+        'user_cart': user_cart,
+        }
 
-        return HttpResponse("Room added to cart succesfully.")
-    
-    return HttpResponse("No room available")
+    return render(request, 'booking/cart_detail.html', context)
+
+class CreateGuest(generic.CreateView):
+    model = Guest
+    form_class = GuestForm
+    template_name = 'booking/guest_details.html'  # Create an HTML template for the form
+    success_url = '/success/' 

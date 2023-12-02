@@ -13,13 +13,18 @@
                     <h5 class="card-title">{{room.room_type_object}}</h5>
                     <p class="card-text">{{room.room_type_object.short_description}}</p>
                     <!-- This botton is to reserve, only available to rooms that can be selected -->
+                    <p>{{user.cart.room_type}}</p>
+                    {% if user.cart.room_type != room.room_type_object %}
                     <form method="post" action="{% url 'reservate_room' %}">
                         {% csrf_token %}
                         <button name='room_type_to_reservate' value={{room.room_type_object.type}}
                         class="btn btn-outline-primary ml-2 btn-lg" type="submit">Reservar</button>
                     </form>
+                    {% else %}
+                    <button class="btn btn-outline-primary ml-2 btn-lg">Ya está seleccionado</button>
                     <!---->
                     <a href="{% url 'room_detail' room.room_type_object.uuid %}">Info</a>
+                    {% endif %}
                 </div>
             {% else %}
                 <img style="filter: grayscale(100%);" src="{{room.room_type_object.images.all.0.image.url}}" class="card-img-top" alt="{{room.room_type_object.images.all.0.alt}}">

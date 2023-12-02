@@ -27,32 +27,14 @@ def find_available_rooms(room_type, r_check_in_date, r_check_out_date):
     # This functions returns all the rooms of a roomtype available from checkin to checkout.
     return Room.objects.filter(
                 type = room_type,
-                space_taken = False,
             ).exclude(
                 room_id__in = RoomReservations.objects.filter(
                     Q(check_out_date__gt=r_check_in_date) & Q(check_in_date__lt=r_check_out_date))
                     .values('room_id')
             )
 
-def reset_user_cart_if_exists(request):
-    user_cart = ReservationCart.objects.filter(user=request.user)
-    if user_cart.exists():
-        if user_cart[0].room:
-            user_cart[0].room.space_taken = False
-            user_cart[0].room.save()
-
-            user_cart[0].room = None
-            user_cart[0].save()
-
 def delete_user_cart_if_exists(request):
     user_cart = ReservationCart.objects.filter(user=request.user)
     if user_cart.exists():
-        if user_cart[0].room:
-            user_cart[0].room.space_taken = False
-            user_cart[0].room.save()
-
-            user_cart[0].room = None
-            user_cart[0].save()
-
         user_cart[0].delete()
         print("Just deleted a cart from this user!")

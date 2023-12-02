@@ -41,7 +41,6 @@ class Room(models.Model):
 
     avaliability = models.BooleanField(default=True)
 
-    space_taken = models.BooleanField(default=False)
     # When a user reserves a room, but it hasnt been confirmed this becomes True, so no one else steals the room.
     # When the reservation is confirmed that this will return to false.
 
@@ -91,17 +90,41 @@ class ReservationCart(models.Model):
         unique=True,
         editable=False,
         null=False,
-    )
+    ) # This way the user can acces its cart with user.cart.
 
     check_in_date = models.DateField(null=False)
     check_out_date = models.DateField(null=False)
+    nights = models.IntegerField(null=True)
+
+    reservation_price = models.DecimalField(decimal_places=2, max_digits=8, null=True)
+    taxes = models.DecimalField(decimal_places=2, max_digits=8, null=True)
+    total_price = models.DecimalField(decimal_places=2, max_digits=8, null=True)
+
+    room_type = models.ForeignKey(
+        RoomType,
+        on_delete=models.CASCADE,
+        null=True,
+    )
 
     room = models.ForeignKey(
         Room,
         on_delete=models.CASCADE,
         null=True,
     )
-    # This way the user can acces its cart with user.cart.
+
+# This table will relate to the user cart, it contains the guest info and card info.
+class Guest(models.Model):
+    name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+    postal_code = models.CharField(max_length=20)  # Adjust max_length based on your requirements
+    card_number = models.CharField(max_length=16)  # Assuming a typical credit card number length
+    expire_date = models.CharField(max_length=7)   # Assuming MM/YYYY format for expiration date
+    csv = models.CharField(max_length=4)           # Assuming a typical CSV length
+
+    def __str__(self):
+        return f'{self.name} {self.last_name}'
+    
 
 """Room Reservations refers to the tables that contain all the reservations that have been made to a room."""
 class RoomReservations(models.Model):
