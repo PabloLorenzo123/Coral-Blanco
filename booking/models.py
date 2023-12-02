@@ -6,6 +6,28 @@ from accounts.models import CustomUser
 
 
 """Room and Images"""
+class RoomType(models.Model):
+    room_type_id = models.AutoField(primary_key=True) # to save space with foreign keys.
+
+    uuid = models.UUIDField( # For displaying detailview without exposing the database.
+        default = uuid.uuid4,
+        editable = False,
+        unique = True,
+    )
+
+    type = models.CharField(max_length=255, unique=True)
+    # With RoomType.objects[x].images can acces its images.
+    short_description = models.TextField(blank=True, null=True)
+    description = models.TextField()
+
+    max_adults = models.IntegerField(blank=True, null=True)
+    max_children = models.IntegerField(blank=True, null=True)
+    
+    price = models.DecimalField(max_digits=6, decimal_places=2)
+
+    def __str__(self):
+        return self.type
+
 class Room(models.Model):
     room_id = models.AutoField(primary_key=True)
 
@@ -28,27 +50,7 @@ class Room(models.Model):
     def __str__(self):
         return str(self.number)
 
-class RoomType(models.Model):
-    room_type_id = models.AutoField(primary_key=True) # to save space with foreign keys.
 
-    uuid = models.UUIDField( # For displaying detailview without exposing the database.
-        default = uuid.uuid4,
-        editable = False,
-        unique = True,
-    )
-
-    type = models.CharField(max_length=255, unique=True)
-    # With RoomType.objects[x].images can acces its images.
-    short_description = models.TextField(blank=True, null=True)
-    description = models.TextField()
-
-    max_adults = models.IntegerField(blank=True, null=True)
-    max_children = models.IntegerField(blank=True, null=True)
-    
-    price = models.DecimalField(max_digits=6, decimal_places=2)
-
-    def __str__(self):
-        return self.type
     
 class Image(models.Model):
     room_type = models.ForeignKey(
@@ -79,7 +81,7 @@ class Image(models.Model):
 class ReservationCart(models.Model):
     id = models.AutoField(primary_key=True)
 
-    user = models.ForeignKey(
+    user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE,
         related_name="cart",
         unique=True,

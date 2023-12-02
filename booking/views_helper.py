@@ -15,7 +15,7 @@ class RoomSearch:
 
         elif not self.room_fits:
             self.room_can_be_select = False
-            self.status = "No se puede reservar esta habitación ya que excede el limite de " + "huéspedes de " + str({self.room_type_object.max_adults}) + " adultos y " + str({self.room_type_object.max_children}) + " niÑos"
+            self.status = "No se puede reservar esta habitación ya que excede el limite de " + "huéspedes de " + str(self.room_type_object.max_adults) + " adultos y " + str(self.room_type_object.max_children) + " niÑos"
         
         elif self.room_fits and not self.room_is_available:
             self.room_can_be_select = False

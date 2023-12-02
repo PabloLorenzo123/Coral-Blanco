@@ -3,11 +3,30 @@
 
 {% block content %}
 
-{% for room in room_types %}
-    <h1>{{room.room_type_object}}</h1>
-    {% if not room.room_can_be_selected %}
-        <p>{{room.status}}</p>
-    {% endif %}
-
-{% endfor %}
+<div class="row row-cols-2 row-cols-md-3 g-4 p-5">
+    {% for room in room_types %}
+    <div class="col">
+        <div class="card">
+            {% if room.room_can_be_selected %}
+                <img src="{{room.room_type_object.images.all.0.image.url}}" class="card-img-top" alt="{{room.room_type_object.images.all.0.alt}}">
+                <div class="card-body">
+                    <h5 class="card-title">{{room.room_type_object}}</h5>
+                    <p class="card-text">{{room.room_type_object.short_description}}</p>
+                    <button class="btn btn-outline-primary ml-2 btn-lg" >Reservar</button>
+                    <a href="{% url 'room_detail' room.room_type_object.uuid %}">Info</a>
+                </div>
+            {% else %}
+                <img style="filter: grayscale(100%);" src="{{room.room_type_object.images.all.0.image.url}}" class="card-img-top" alt="{{room.room_type_object.images.all.0.alt}}">
+                <div class="card-body">
+                    <h5 class="card-title">{{room.room_type_object}}</h5>
+                    <p class="card-text">{{room.room_type_object.short_description}}</p>
+                    <p class="card-text">{{room.status}}</p>
+                    <button class="btn btn-outline-primary ml-2 btn-lg" >Reservar</button>
+                    <a href="{% url 'room_detail' room.room_type_object.uuid %}">Info</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endblock content %}
