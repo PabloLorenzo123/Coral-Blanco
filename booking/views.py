@@ -16,6 +16,11 @@ class RoomDetailView(generic.DetailView):
         # I'm updating the get_object method so it uses the uuid instead of the pk.
         return RoomType.objects.get(uuid=self.kwargs['uuid'])
     
+class RoomsListView(generic.ListView):
+    model = RoomType
+    template_name = 'rooms.html'
+    context_object_name = 'room_types'
+    
 def search_room(request):
     # first check the user is logged in, with @loginrequired.
     r_adults = int(request.GET.get('adults'))
