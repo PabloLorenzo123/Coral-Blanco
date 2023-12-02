@@ -2,11 +2,10 @@ from django.shortcuts import render
 from django.views.generic import DetailView, ListView
 from django.views import generic
 from django.db.models import Q
-from .views_helper import RoomSearch
 from django.http import HttpResponse
 
 from .models import RoomType, Room, ReservationCart, RoomReservations
-
+from .views_helper import RoomSearch, delete_user_cart_if_exists, reset_user_cart_if_exists, find_available_rooms
 # Create your views here.
 class RoomDetailView(generic.DetailView):
     model = RoomType
@@ -18,38 +17,6 @@ class RoomDetailView(generic.DetailView):
         # I'm updating the get_object method so it uses the uuid instead of the pk.
         return RoomType.objects.get(uuid=self.kwargs['uuid'])
 
-
-def find_available_rooms(room_type, r_check_in_date, r_check_out_date):
-    # This functions returns all the rooms of a roomtype available from checkin to checkout.
-    return Room.objects.filter(
-                type = room_type,
-                space_taken = False,
-            ).exclude(
-                room_id__in = RoomReservations.objects.filter(
-                    Q(check_out_date__gt=r_check_in_date) & Q(check_in_date__lt=r_check_out_date))
-                    .values('room_id')
-            )
-
-def reset_user_cart_if_exists(request):
-    user_cart = ReservationCart.objects.filter(user=request.user)
-    if user_cart.exists():
-        if user_cart[0].room:
-            user_cart[0].room.space_taken = False
-            user_cart[0].room.save()
-
-            user_cart[0].room = None
-            user_cart[0].save()
-
-def delete_user_cart_if_exists(request):
-    user_cart = ReservationCart.objects.filter(user=request.user)
-    if user_cart.exists():
-        if user_cart[0].room:
-            user_cart[0].room.space_taken = False
-            user_cart[0].room.save()
-
-            user_cart[0].room = None
-            user_cart[0].save()
-        user_cart[0].delete()
     
 def search_room(request):
     # first check the user is logged in, with @loginrequired.
@@ -58,15 +25,8 @@ def search_room(request):
     r_check_in_date = request.GET.get('check_in_date')
     r_check_out_date = request.GET.get('check_out_date')
 
-    # check if he has a cart.
-    if ReservationCart.objects.filter(user=request.user).exists():
-        # if he has one delete it, make sure to reset all info.
-        user_cart = ReservationCart.objects.filter(user=request.user)
-        if user_cart[0].room:
-            user_cart[0].room.space_taken = False
-        user_cart.delete()
-        print("This user already has a cart!, lets delete it!")
-
+    # check if he has a cart, if he has delete and reset the room he had.
+    delete_user_cart_if_exists(request)
     # Then create a new cart for this user.
     ReservationCart.objects.create(
             user=request.user,
@@ -82,14 +42,11 @@ def search_room(request):
 
         if room_type.max_adults >= r_adults and room_type.max_children >= r_children:
             room_type_fits = True # this means that this type of room can fit this many people.
-            room_type_available = False # This is to check if there are rooms available for this type.
 
             # We now need to check, if there rooms available for this type of room.
             available_rooms = find_available_rooms(room_type, r_check_in_date, r_check_out_date)
             # If there is room available for this type.
-            if len(available_rooms) > 0:
-                room_type_available = True
-            
+            room_type_available = len(available_rooms) > 0 # This is to check if there are rooms available for this type.
             # If the type applies for the amount of people, and it's available show in the listview as normal.
             # If the room type apllies for the amount of people, but there are not rooms available, show 'habitación no disponible'
             available_room_types['room_types'].append(
@@ -113,12 +70,12 @@ def reservate_now(request):
     if not user_cart_query.exists():
         # redirect to home.
         print("User doesn't have a cart")
-        pass
-    else:
-        # Lets see if there is a room in there already, if he does reset the cart.
-        # This way if he goes back to the page, his choice still remains.
-        # If he choses another room then the previous one will be erased, and the other one will be added.
-        reset_user_cart_if_exists(request)
+        return
+    
+    # Lets see if there is a room in there already, if he does reset the cart.
+    # This way if he goes back to the page, his choice still remains.
+    # If he choses another room then the previous one will be erased, and the other one will be added.
+    reset_user_cart_if_exists(request)
     
 
     # 2. Find an available room of the type requested, and set space_taken = True, and add the room to the cart.
@@ -135,36 +92,15 @@ def reservate_now(request):
     print(available_rooms)
 
     # Now we need to assign a room to his/her cart.
-    reserved_room = available_rooms[0]
-    reserved_room.space_taken = True
-
-    reserved_room.save()
-
-    user_cart.room = reserved_room
-    user_cart.save()
-
-    return HttpResponse("Room added to cart succesfully.")
-
     if room_available:
-        
         reserved_room = available_rooms[0]
-        if not user_cart.room:
-            reserved_room.space_taken = True
-            user_cart.room = reserved_room # Now this room is added to the user's cart.
-            reserved_room.save()
-            user_cart.save()
-            print(user_cart.room.number)
-            print(str(user_cart.room.space_taken))
-            return HttpResponse("Room added to cart succesfully.")
-        else:
-            # If he has a room already reset the space taken attribute, and change its value.
-            user_cart.room.space_taken = False
+        reserved_room.space_taken = True
 
-            reserved_room.space_taken = False
-            user_cart.room = reserved_room
+        reserved_room.save()
 
-            reserved_room.save()
-            user_cart.save()
-            return HttpResponse("cart reset succesfully.")
-        
-        print(room_type, r_check_in_date, r_check_out_date)
+        user_cart.room = reserved_room
+        user_cart.save()
+
+        return HttpResponse("Room added to cart succesfully.")
+    
+    return HttpResponse("No room available")
