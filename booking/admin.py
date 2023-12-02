@@ -11,6 +11,7 @@ class RoomTypeAdmin(admin.ModelAdmin):
     ]
     list_display = ('type', 'price',)
 
+    
 admin.site.register(RoomType, RoomTypeAdmin)
 admin.site.register(Room)
 admin.site.register(Image)

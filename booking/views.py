@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.views.generic import DetailView, ListView
 from django.views import generic
 from django.db.models import Q
 from .views_helper import RoomSearch
@@ -11,6 +12,11 @@ class RoomDetailView(generic.DetailView):
     template_name = 'booking/room_detail.html'
     context_object_name = 'room'
 
+    def get_object(self):
+        # UpdateUser view is expecting a primary key (pk) or slug in the URL, but it's not receiving it.
+        # I'm updating the get_object method so it uses the uuid instead of the pk.
+        return RoomType.objects.get(uuid=self.kwargs['uuid'])
+    
 def search_room(request):
     # first check the user is logged in, with @loginrequired.
     r_adults = int(request.GET.get('adults'))

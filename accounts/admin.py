@@ -22,4 +22,9 @@ class CustomUserAdmin(UserAdmin):
         "is_superuser",
     )
 
+# Styling admin 
+admin.site.site_header = "Hotel"
+admin.site.site_title = "Hotel administration"
+admin.site.index_title = "Hotel administration"
+
 admin.site.register(CustomUser, CustomUserAdmin)
