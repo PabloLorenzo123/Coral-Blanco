@@ -12,7 +12,13 @@
                 <div class="card-body">
                     <h5 class="card-title">{{room.room_type_object}}</h5>
                     <p class="card-text">{{room.room_type_object.short_description}}</p>
-                    <button class="btn btn-outline-primary ml-2 btn-lg" >Reservar</button>
+                    <!-- This botton is to reserve, only available to rooms that can be selected -->
+                    <form method="post" action="{% url 'reservate_room' %}">
+                        {% csrf_token %}
+                        <button name='room_type_to_reservate' value={{room.room_type_object.type}}
+                        class="btn btn-outline-primary ml-2 btn-lg" type="submit">Reservar</button>
+                    </form>
+                    <!---->
                     <a href="{% url 'room_detail' room.room_type_object.uuid %}">Info</a>
                 </div>
             {% else %}
@@ -21,7 +27,7 @@
                     <h5 class="card-title">{{room.room_type_object}}</h5>
                     <p class="card-text">{{room.room_type_object.short_description}}</p>
                     <p class="card-text">{{room.status}}</p>
-                    <button class="btn btn-outline-primary ml-2 btn-lg" >Reservar</button>
+                    <!--<button class="btn btn-outline-primary ml-2 btn-lg" >Reservar</button>-->
                     <a href="{% url 'room_detail' room.room_type_object.uuid %}">Info</a>
                 </div>
             {% endif %}

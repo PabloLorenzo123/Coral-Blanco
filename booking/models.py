@@ -41,6 +41,10 @@ class Room(models.Model):
 
     avaliability = models.BooleanField(default=True)
 
+    space_taken = models.BooleanField(default=False)
+    # When a user reserves a room, but it hasnt been confirmed this becomes True, so no one else steals the room.
+    # When the reservation is confirmed that this will return to false.
+
     type = models.ForeignKey(
         RoomType,
         on_delete=models.CASCADE,
@@ -91,6 +95,12 @@ class ReservationCart(models.Model):
 
     check_in_date = models.DateField(null=False)
     check_out_date = models.DateField(null=False)
+
+    room = models.ForeignKey(
+        Room,
+        on_delete=models.CASCADE,
+        null=True,
+    )
     # This way the user can acces its cart with user.cart.
 
 """Room Reservations refers to the tables that contain all the reservations that have been made to a room."""
