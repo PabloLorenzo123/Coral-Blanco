@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 from accounts.models import CustomUser
+from django.db.models import Q
 
 # Create your models here.
 
@@ -25,6 +26,18 @@ class RoomType(models.Model):
     
     price = models.DecimalField(max_digits=6, decimal_places=2)
 
+    def get_available_rooms(self, r_check_in_date, r_check_out_date):
+        return Room.objects.filter(
+                type = self.room_type_id,
+            ).exclude(
+                room_id__in = RoomReservations.objects.filter(
+                    Q(check_out_date__gt=r_check_in_date) & Q(check_in_date__lt=r_check_out_date))
+                    .values('room_id')
+            )
+    
+    def is_there_room_available(self, r_check_in_date, r_check_out_date):
+        return len(self.get_available_rooms(r_check_in_date, r_check_out_date)) > 0
+    
     def __str__(self):
         return self.type
 
@@ -91,9 +104,11 @@ class ReservationCart(models.Model):
         editable=False,
         null=False,
     ) # This way the user can acces its cart with user.cart.
-
+    adults = models.IntegerField(null=True, default=0)
+    children = models.IntegerField(null=True, default=0)
     check_in_date = models.DateField(null=False)
     check_out_date = models.DateField(null=False)
+
     nights = models.IntegerField(null=True)
 
     reservation_price = models.DecimalField(decimal_places=2, max_digits=8, null=True)
