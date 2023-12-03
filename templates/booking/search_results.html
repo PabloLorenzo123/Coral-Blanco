@@ -13,9 +13,8 @@
                     <h5 class="card-title">{{room.room_type_object}}</h5>
                     <p class="card-text">{{room.room_type_object.short_description}}</p>
                     <!-- This botton is to reserve, only available to rooms that can be selected -->
-                    <p>{{user.cart.room_type}}</p>
                     {% if user.cart.room_type != room.room_type_object %}
-                    <form method="post" action="{% url 'reservate_room' %}">
+                    <form method="post" action="{% url 'reservate_room' user.cart.uuid %}">
                         {% csrf_token %}
                         <button name='room_type_to_reservate' value={{room.room_type_object.type}}
                         class="btn btn-outline-primary ml-2 btn-lg" type="submit">Reservar</button>

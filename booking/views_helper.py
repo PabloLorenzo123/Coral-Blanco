@@ -1,6 +1,5 @@
 """This file is for the definition of the classes which will be used in search_results"""
-from .models import ReservationCart, Room, RoomType, RoomReservations
-from django.db.models import Q
+from .models import ReservationCart
 
 class RoomSearch:
     
@@ -23,25 +22,17 @@ class RoomSearch:
             self.room_can_be_select = False
             self.status = "Esta habitación no se encuentra disponible"
 
-def find_available_rooms(room_type, r_check_in_date, r_check_out_date):
-    # This functions returns all the rooms of a roomtype available from checkin to checkout.
-    return Room.objects.filter(
-                type = room_type,
-            ).exclude(
-                room_id__in = RoomReservations.objects.filter(
-                    Q(check_out_date__gt=r_check_in_date) & Q(check_in_date__lt=r_check_out_date))
-                    .values('room_id')
-            )
-
 def update_user_cart_if_different(request, r_adults, r_children, r_check_in_date, r_check_out_date):
     user_cart_query = ReservationCart.objects.filter(user=request.user)
+    
     if user_cart_query.exists():
         u_cart = user_cart_query[0] # This is to get the object.
         # If the user is making the same reservation request, we keep everything the same.
-        if u_cart.adults == r_adults and u_cart.children == r_children and u_cart.check_in_date == r_check_in_date and u_cart.check_out_date == r_check_out_date:
+        if u_cart.adults == r_adults and u_cart.children == r_children and str(u_cart.check_in_date) == r_check_in_date and str(u_cart.check_out_date) == r_check_out_date:
             print("This cart remains unchanged")
         else:
             u_cart.adults, u_cart.children, u_cart.check_in_date, u_cart.check_out_date = r_adults, r_children, r_check_in_date, r_check_out_date
+            u_cart.room_type = None
             u_cart.save()
             print("The user has already a cart, let's update it with the new info.")
     else:

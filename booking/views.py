@@ -1,13 +1,11 @@
-from django.shortcuts import render
-from django.views.generic import DetailView, ListView
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
-from django.db.models import Q
-from django.http import HttpResponse
-from django.urls import reverse, reverse_lazy
+from django.http import HttpResponseForbidden
+from django.urls import reverse
 
-from .models import RoomType, Room, ReservationCart, RoomReservations, Guest
+from .models import RoomType, ReservationCart, Guest
 from .forms import GuestForm
-from .views_helper import RoomSearch, update_user_cart_if_different, find_available_rooms
+from .views_helper import RoomSearch, update_user_cart_if_different
 
 # Create your views here.
 class RoomDetailView(generic.DetailView):
@@ -53,17 +51,14 @@ def search_room(request):
     # This return will send to the template a dictionary which of objects which have the type of room, and if their avaliability.
     return render(request, 'booking/search_results.html', context)
 
-
-def reservate_now(request):
+# logged in mixin.
+# this can be a detailview.
+def reservate_now(request, uuid):
     # This is a post request, to add a room to the user's cart.
-    # User needs to be logged in, and have a cart.
-    user_cart_query = ReservationCart.objects.filter(user=request.user)
-
-    # To pass the test you need to be logged in, have a cart.
-    if not request.user.is_authenticated or not user_cart_query.exists():
-        # redirect to home.
-        print("User doesn't have a cart, he can't reservate")
-        return
+    # User needs to be logged in, and have a cart (which they're the owner of).
+    user_cart_query = ReservationCart.objects.filter(user=request.user, uuid=uuid)
+    if not user_cart_query.exists():
+        print("This user doesn't pass the testt")
     
     user_cart = user_cart_query[0] # because filter returns a queryset and not an object.
 
@@ -74,14 +69,9 @@ def reservate_now(request):
     user_cart.room_type = room_type
     user_cart.save()
 
-    print(user_cart.room_type)
-
-    #3. Now we have to calculate the total price.
-    user_cart.nights = (user_cart.check_out_date - user_cart.check_in_date).days - 1
-    user_cart.reservation_price = float(user_cart.nights * user_cart.room_type.price)
-    user_cart.taxes = float(user_cart.reservation_price) * 0.20 # HERE DEFINE A TAXES CALCULATOR!
-    user_cart.total_price = user_cart.reservation_price + user_cart.taxes
-    user_cart.save()
+    # 3. We now need to set the info of the cart (total_price, taxes, nights)
+    user_cart.set_cart_info()
+    print(user_cart)
 
     context = {
         'user_cart': user_cart,
@@ -93,4 +83,79 @@ class CreateGuest(generic.CreateView):
     model = Guest
     form_class = GuestForm
     template_name = 'booking/guest_details.html'  # Create an HTML template for the form
-    success_url = '/success/' 
+
+    def get_success_url(self):
+        user_cart = self.request.user.cart
+        return reverse('confirm_reservation', kwargs={'uuid': user_cart.uuid})
+
+    def get_initial(self):
+        # This way the form gets initial values that could haven provided before in the user account, in user_info.
+        form_context = super().get_initial()
+        form_context['name'] = self.request.user.name
+        form_context['last_name'] = self.request.user.last_name
+        form_context['email'] = self.request.user.email
+        form_context['country'] = self.request.user.country
+        form_context['postal_code'] = self.request.user.postcode
+        return form_context
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if the user already has a guest associated with their cart
+        cart = ReservationCart.objects.get(uuid=kwargs.get('uuid')) # This is the uuid at the end of the url.
+
+        if Guest.objects.filter(user_cart=cart).exists():
+            # In case the user's cart already has a guest associated, let's update it.
+            update_view_url = reverse('update_guest', kwargs={'uuid': kwargs.get('uuid')})
+            return redirect(update_view_url)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        # Your form validation logic, e.g., saving the form data
+        # Don't forget to add the cart field.
+
+        # Create a new instance of the Guest model with form data
+        guest_instance = form.save(commit=False)
+
+        # Assign the user's cart to the guest_instance
+        guest_instance.user_cart = self.request.user.cart
+
+        # Save the guest_instance to the database
+        guest_instance.save()
+
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        print(form.errors)
+        return super().form_invalid(form)
+    
+class UpdateGuest(generic.UpdateView):
+    model = Guest
+    form_class = GuestForm
+    template_name = 'booking/update_guest_details.html'
+
+    def get_success_url(self):
+        user_cart = self.request.user.cart
+        return reverse('confirm_reservation', kwargs={'uuid': user_cart.uuid})
+
+    def get_object(self):
+        user_cart = ReservationCart.objects.get(uuid = self.kwargs['uuid'])
+        return Guest.objects.get(user_cart=user_cart)
+
+
+class ConfirmReservation(generic.DetailView):
+    model = ReservationCart
+    template_name = "booking/confirm_reservation.html"
+    context_object_name = "reservation"
+    success_url = ''
+    
+    def get_object(self):
+        # Retrieve the cart specified in the url.
+        return get_object_or_404(ReservationCart, uuid=self.kwargs['uuid'])
+    
+    def dispatch(self, request, *args, **kwargs):
+        reservation_cart = self.get_object()
+        # Check if the logged-in user is the owner of the cart
+        if request.user != reservation_cart.user:
+            return HttpResponseForbidden("You do not have permission to view this page.")
+
+        return super().dispatch(request, *args, **kwargs)
