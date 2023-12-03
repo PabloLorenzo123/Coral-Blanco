@@ -141,13 +141,8 @@ class UpdateGuest(generic.UpdateView):
         return Guest.objects.get(user_cart=user_cart)
     
     def dispatch(self, request, *args, **kwargs):
-        # Check if the user already has a guest associated with their cart
-        cart = ReservationCart.objects.get(uuid=kwargs.get('uuid')) # This is the uuid at the end of the url.
-
-        if Guest.objects.filter(user_cart=cart).exists():
-            # In case the user's cart already has a guest associated, let's update it.
-            update_view_url = reverse('update_guest', kwargs={'uuid': kwargs.get('uuid')})
-            return redirect(update_view_url)
+        # Check if the user has a cart, and if the cart of this template is his.
+        get_object_or_404(ReservationCart, uuid=self.request.user.cart.uuid) # This is the uuid at the end of the url.
 
         return super().dispatch(request, *args, **kwargs)
 

@@ -31,6 +31,7 @@ def update_user_cart_if_different(request, r_adults, r_children, r_check_in_date
         if u_cart.adults == r_adults and u_cart.children == r_children and str(u_cart.check_in_date) == r_check_in_date and str(u_cart.check_out_date) == r_check_out_date:
             print("This cart remains unchanged")
         else:
+            u_cart.delete() # to delete guests and related info.
             u_cart.adults, u_cart.children, u_cart.check_in_date, u_cart.check_out_date = r_adults, r_children, r_check_in_date, r_check_out_date
             u_cart.room_type = None
             u_cart.save()
