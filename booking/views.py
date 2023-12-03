@@ -125,7 +125,6 @@ class CreateGuest(generic.CreateView):
         return super().form_valid(form)
     
     def form_invalid(self, form):
-        print(form.errors)
         return super().form_invalid(form)
     
 class UpdateGuest(generic.UpdateView):
@@ -140,7 +139,17 @@ class UpdateGuest(generic.UpdateView):
     def get_object(self):
         user_cart = ReservationCart.objects.get(uuid = self.kwargs['uuid'])
         return Guest.objects.get(user_cart=user_cart)
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if the user already has a guest associated with their cart
+        cart = ReservationCart.objects.get(uuid=kwargs.get('uuid')) # This is the uuid at the end of the url.
 
+        if Guest.objects.filter(user_cart=cart).exists():
+            # In case the user's cart already has a guest associated, let's update it.
+            update_view_url = reverse('update_guest', kwargs={'uuid': kwargs.get('uuid')})
+            return redirect(update_view_url)
+
+        return super().dispatch(request, *args, **kwargs)
 
 class ConfirmReservation(generic.DetailView):
     model = ReservationCart
