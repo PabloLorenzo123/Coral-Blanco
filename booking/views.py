@@ -3,9 +3,9 @@ from django.views import generic
 from django.http import HttpResponseForbidden, HttpResponse
 from django.urls import reverse
 
-from .models import RoomType, ReservationCart, Guest
+from .models import RoomType, ReservationCart, Guest, RoomReservations
 from .forms import GuestForm
-from .views_helper import RoomSearch, update_user_cart_if_different
+from .views_helper import RoomSearch, update_user_reservation_if_neccesary
 from .confirm_reservation_helper import charge_card, send_confirmation_email
 
 # Create your views here.
@@ -27,11 +27,11 @@ def search_room(request):
     r_check_in_date = request.GET.get('check_in_date')
     r_check_out_date = request.GET.get('check_out_date')
 
-    # check if he has a cart, if it's the same reservation keep the cart the same, if its different update the cart, if he doesnt have one create one.
-    update_user_cart_if_different(request, r_adults, r_children, r_check_in_date, r_check_out_date)
+    # Create a reservation.
+    user_reservation = update_user_reservation_if_neccesary(request, r_adults, r_children, r_check_in_date, r_check_out_date)
 
     # Now find what type of rooms can have this many guests, and if they are available.
-    context = {'room_types': []} 
+    context = {'room_types': [], 'user_reservation': user_reservation} 
 
     for room_type in RoomType.objects.all():
 
@@ -183,10 +183,10 @@ The error can't be either there's no room available, or the credit_card specifie
 """
 
 def confirm_reservation_done(request, uuid):
-    reservation = get_object_or_404(ReservationCart.objects.get(uuid=uuid))
+    reservation = get_object_or_404(ReservationCart, uuid=uuid)
     context = {
         'reservation': reservation, 
-        'guest_details': get_object_or_404(ReservationCart.objects.get(user_cart=reservation)), # This ensure there's a guest detail.
+        'guest_details': get_object_or_404(Guest, user_cart=reservation), # This ensure there's a guest detail.
             }
     success = True
 
@@ -208,7 +208,16 @@ def confirm_reservation_done(request, uuid):
     # Complete the reservation. Once complete all the links behind are not accesible.
     reservation.completed = True
     reservation.create_unique_identifier()
+    reservation.save()
+    # Create RoomReservation, to keep track the reservations of a room.
+    RoomReservations.objects.create(
+        room=reservation.room,
+        reservation=reservation,
+        check_in_date = reservation.check_in_date,
+        check_out_date = reservation.check_out_date,
+    )
     # Send email.
     send_confirmation_email(request, reservation)
-    
+
+    return render(request, 'booking/confirm_reservation_done.html', context)
     return HttpResponse('La reservación ha sido exitosa, revise su correo para que vea su confirmación.')

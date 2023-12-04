@@ -96,23 +96,22 @@ class Image(models.Model):
 """ReservationCart means the cart of a reservation that is in progress but has not been paid or confirmed"""
 class ReservationCart(models.Model):
     id = models.AutoField(primary_key=True)
-    
+
+    # With the combination of an UUID and the guest name we'll create the identifier.
+    reservation_confirmation_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    unique_identifier = models.CharField(max_length=70, null=True)
+
     uuid = models.UUIDField(
         default = uuid.uuid4,
         editable = False,
         unique = True,
-        null=True
     ) # With this we keep track of the user_cart in the urls.
 
-    # With the combination of an UUID and the guest name we'll create the identifier.
-    reservation_confirmation_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    unique_identifier = models.CharField(70, null=True)
-
-    user = models.OneToOneField(
-        CustomUser, on_delete=models.CASCADE,
+    user = models.ForeignKey(
+        CustomUser,
         related_name="cart",
-        unique=True,
         editable=False,
+        on_delete=models.CASCADE,
         null=False,
     ) # This way the user can acces its cart with user.cart.
 
@@ -182,20 +181,14 @@ class Guest(models.Model):
 class RoomReservations(models.Model):
     id = models.AutoField(primary_key=True)
 
-    
     room = models.ForeignKey(
         Room, on_delete = models.CASCADE,
     ) # with this we can know the type, and price.
-
-    adults = models.IntegerField()
-    children = models.IntegerField()
-
-    total_price = models.IntegerField() # This will be equal to price * day/night.
-
-    cart = models.ForeignKey(
-        ReservationCart, on_delete=models.CASCADE,
-        related_name='room_reserved',
+    reservation = models.ForeignKey(
+        ReservationCart,
+        on_delete=models.CASCADE,
+        null=True
     )
-    
+    # Can acces the reservation with RoomReservations.reservation.
     check_in_date = models.DateField(null=True)
     check_out_date = models.DateField(null=True) # remember to add null false.

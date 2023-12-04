@@ -6,5 +6,5 @@
 {{reservation}}
 <h1>Detalles del huésped</h1>
 {{reservation.guest}}
-
+<button><a href="{% url 'confirm_reservation_done' reservation.uuid %}">Confirmar</a></button>
 {% endblock content %}
