@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.urls import reverse
 
 from .models import RoomType, ReservationCart, Guest
 from .forms import GuestForm
 from .views_helper import RoomSearch, update_user_cart_if_different
+from .confirm_reservation_helper import charge_card, send_confirmation_email
 
 # Create your views here.
 class RoomDetailView(generic.DetailView):
@@ -163,3 +164,51 @@ class ConfirmReservation(generic.DetailView):
             return HttpResponseForbidden("You do not have permission to view this page.")
 
         return super().dispatch(request, *args, **kwargs)
+    
+"""Confirm_reservation_done, is used when the the confirm button is clicked on the last template
+This function needs to send a html email, with the details of the reservation to the email specified 
+in the guest (which is related to the ReservationCart table).
+
+- 1. Need to check first that there's still room available. If so the reservation was succesful, if not it was unsuccesful.
+- 2. Then we need to charge 0$ dollars to the credit_card specified to see if it's valid, if the transaction is succesful, then proceed.
+- 3. Then assign a room to the reservation, which will be saved in the ReservationCart.
+- 4. When the reservation is completed, we assign the value completed=true, so when a user gets to make a new reservation he does on another.
+instance.
+- 5. Send the html confirmation email.
+
+the return template is a template which confirms everything went smooth. If there's an error we'll notify it.
+
+The error can't be either there's no room available, or the credit_card specified is invalid, or both.
+
+"""
+
+def confirm_reservation_done(request, uuid):
+    reservation = get_object_or_404(ReservationCart.objects.get(uuid=uuid))
+    context = {
+        'reservation': reservation, 
+        'guest_details': get_object_or_404(ReservationCart.objects.get(user_cart=reservation)), # This ensure there's a guest detail.
+            }
+    success = True
+
+    if reservation.user != request.user or reservation != request.user.cart:
+        return HttpResponseForbidden('No eres el dueÑo de esta reservación')
+    
+    if not reservation.room_type.is_there_room_available(reservation.check_in_date, reservation.check_out_date):
+        success = False
+        reservation.delete()
+        return HttpResponse('Ya no hay habitación disponible, intentelo denuevo.')
+    
+    # Charge the $0 dollars to the guest account.
+    if not charge_card(request):
+        success = False
+        reservation.delete()
+        return HttpResponse('La información bancaria ofrecida no es valida, intentelo denuevo.')
+    # Assign room to the reservation.
+    reservation.room = reservation.room_type.get_available_rooms(reservation.check_in_date, reservation.check_out_date)[0]
+    # Complete the reservation. Once complete all the links behind are not accesible.
+    reservation.completed = True
+    reservation.create_unique_identifier()
+    # Send email.
+    send_confirmation_email(request, reservation)
+    
+    return HttpResponse('La reservación ha sido exitosa, revise su correo para que vea su confirmación.')

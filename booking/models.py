@@ -104,6 +104,10 @@ class ReservationCart(models.Model):
         null=True
     ) # With this we keep track of the user_cart in the urls.
 
+    # With the combination of an UUID and the guest name we'll create the identifier.
+    reservation_confirmation_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    unique_identifier = models.CharField(70, null=True)
+
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE,
         related_name="cart",
@@ -135,12 +139,17 @@ class ReservationCart(models.Model):
         null=True,
     )
 
+    completed = models.BooleanField(default=False)
+
     def set_cart_info(self):
          self.nights = (self.check_out_date - self.check_in_date).days - 1
          self.reservation_price = float(self.nights * self.room_type.price)
          self.taxes = float(self.reservation_price) * 0.20 # HERE DEFINE A TAXES CALCULATOR!
          self.total_price = self.reservation_price + self.taxes
          self.save()
+    
+    def create_unique_identifier(self):
+        self.unique_identifier = f"{self.guest.country}{self.reservation_confirmation_uuid}-{self.guest.name}"
     
     def __str__(self):
         return f"Cart of {self.user.name}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
@@ -172,6 +181,7 @@ class Guest(models.Model):
 """Room Reservations refers to the tables that contain all the reservations that have been made to a room."""
 class RoomReservations(models.Model):
     id = models.AutoField(primary_key=True)
+
     
     room = models.ForeignKey(
         Room, on_delete = models.CASCADE,
