@@ -3,10 +3,6 @@ import uuid
 from accounts.models import CustomUser
 
 # Create your models here.
-<<<<<<< HEAD
-class RoomType(models.Model):
-    room_type_id = models.AutoField(primary_key=True) # to save space with foreign keys.
-=======
 
 
 """Room and Images"""
@@ -20,7 +16,7 @@ class RoomType(models.Model):
     )
 
     type = models.CharField(max_length=255, unique=True)
-    # With RoomType.objects[x].images can acces its images.
+    # With RoomType.objects[x].images can access its images.
     short_description = models.TextField(blank=True, null=True)
     description = models.TextField()
 
@@ -54,7 +50,6 @@ class Room(models.Model):
     def __str__(self):
         return str(self.number)
 
->>>>>>> d244ad8be474d037bedfd5ba1142b29fa33b2a73
 
     
 class Image(models.Model):
@@ -141,3 +136,23 @@ class RoomReservations(models.Model):
     
     check_in_date = models.DateField(null=True)
     check_out_date = models.DateField(null=True) # remember to add null false.
+
+class Feature(models.Model):
+    feature = models.CharField(max_length=100)
+    icon = models.CharField(max_length=100, default="")
+    
+    def __str__(self):
+        return self.feature
+
+class RoomFeature(models.Model):
+    room_type = models.ForeignKey(
+        RoomType,
+        on_delete=models.CASCADE,
+        related_name='features'
+    )
+    feature = models.ForeignKey(
+        Feature,
+        on_delete=models.CASCADE,
+        related_name='room_types'
+    )
+

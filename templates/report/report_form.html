@@ -1,0 +1,41 @@
+{% extends '_base.html' %}
+
+{% block title %}Report{% endblock title %}
+
+{% block content %}
+    <div class="p-4 d-flex align-items-center">
+        <div class="container border rounded p-4 shadow-sm">
+            <form method="get" action="{% url 'download_report' %}">
+                <div class="mb-3">
+                  <label for="object" class="form-label">Object</label>
+                  <select name="object" id="object" class="form-select">
+                    <option value="room_types">Room Types</option>
+                    <option value="rooms">Rooms</option>
+                    <option value="reservations">Reservations</option>
+                    <option value="guests">Guests</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="start_date" class="form-label">Start Date</label>
+                  <input type="date" name="start_date" class="form-control" id="start_date">
+                  <div id="dateHelp" class="form-text">Optional.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" name="end_date" class="form-control" id="end_date">
+                    <div id="dateHelp" class="form-text">Optional.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="file_type" class="form-label">File Type</label>
+                    <select class="form-select" id="file_type">
+                      <option>CSV</option>
+                      <option>PDF</option>
+                      <option>TXT</option>
+                    </select>
+                  </div>
+                <button type="submit" class="btn btn-primary">Download</button>
+            </form>
+        </div>
+    </div>
+    
+{% endblock content %}

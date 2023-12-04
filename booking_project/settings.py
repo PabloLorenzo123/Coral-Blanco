@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # Local
     'accounts.apps.AccountsConfig',
     'booking.apps.BookingConfig',
+    'reports.apps.ReportsConfig',
     # Third party apps.
     # Third party.
     "crispy_forms",

@@ -3,6 +3,8 @@ from django.views.generic import DetailView, ListView
 from django.views import generic
 from django.db.models import Q
 from .views_helper import RoomSearch
+from django.http import HttpResponse
+import csv
 
 from .models import RoomType, Room, ReservationCart, RoomReservations
 
@@ -21,7 +23,7 @@ class RoomsListView(generic.ListView):
     model = RoomType
     template_name = 'rooms.html'
     context_object_name = 'room_types'
-    
+      
 def search_room(request):
     # first check the user is logged in, with @loginrequired.
     r_adults = int(request.GET.get('adults'))
