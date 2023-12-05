@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from accounts.models import CustomUser
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 # Create your models here.
 
@@ -151,7 +152,7 @@ class ReservationCart(models.Model):
         self.unique_identifier = f"{self.guest.country}{self.reservation_confirmation_uuid}-{self.guest.name}"
     
     def __str__(self):
-        return f"Cart of {self.user.name}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
+        return f"Reservation of {self.user.username}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
 
 # This table will relate to the user cart, it contains the guest info and card info.
 class Guest(models.Model):

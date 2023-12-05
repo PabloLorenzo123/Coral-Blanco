@@ -155,6 +155,8 @@ ACCOUNT_CHANGE_EMAIL = False
 ACCOUNT_SIGNUP_REDIRECT_URL = 'account_login'
 ACCOUNT_LOGIN_REDIRECT_URL = 'home'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'home' # This fixes signup redirect.
+LOGOUT_REDIRECT_URL = 'home'
 
 
 

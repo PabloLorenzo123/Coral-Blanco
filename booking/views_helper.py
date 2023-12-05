@@ -51,3 +51,7 @@ def update_user_reservation_if_neccesary(request, r_adults, r_children, r_check_
     else:
         # If he doesn't have any then create a new one.
         return create_reservation(request, r_adults, r_children, r_check_in_date, r_check_out_date)
+    
+"""This function returns the current reservation instance."""
+def return_reservation_object(request, uuid):
+    return get_object_or_404(ReservationCart, user=request.user, completed=False, uuid=uuid)

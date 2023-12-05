@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from .models import RoomType, ReservationCart, Guest, RoomReservations
 from .forms import GuestForm
-from .views_helper import RoomSearch, update_user_reservation_if_neccesary
+from .views_helper import RoomSearch, update_user_reservation_if_neccesary, return_reservation_object
 from .confirm_reservation_helper import charge_card, send_confirmation_email
 
 # Create your views here.
@@ -19,7 +19,12 @@ class RoomDetailView(generic.DetailView):
         # I'm updating the get_object method so it uses the uuid instead of the pk.
         return RoomType.objects.get(uuid=self.kwargs['uuid'])
 
-    
+"""This function is executed when the search room button is clicked, its job is to create a new reservation for the user
+and display the rooms that are available.
+- First you need to get the search room fields values, create a reservation with that data.
+- Then look for each type of room, and check if it has the capacity requested.
+- Then see if there're room available with no booking between the dates requested.
+- Return a dictionary of all the rooms, indicating if they're available or not, and why."""  
 def search_room(request):
     # first check the user is logged in, with @loginrequired.
     r_adults = int(request.GET.get('adults'))
@@ -86,7 +91,7 @@ class CreateGuest(generic.CreateView):
     template_name = 'booking/guest_details.html'  # Create an HTML template for the form
 
     def get_success_url(self):
-        user_cart = self.request.user.cart
+        user_cart = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         return reverse('confirm_reservation', kwargs={'uuid': user_cart.uuid})
 
     def get_initial(self):
@@ -101,9 +106,9 @@ class CreateGuest(generic.CreateView):
     
     def dispatch(self, request, *args, **kwargs):
         # Check if the user already has a guest associated with their cart
-        cart = ReservationCart.objects.get(uuid=kwargs.get('uuid')) # This is the uuid at the end of the url.
+        user_reservation = return_reservation_object(request=self.request, uuid=kwargs.get('uuid')) # This is the uuid at the end of the url.
 
-        if Guest.objects.filter(user_cart=cart).exists():
+        if Guest.objects.filter(user_cart=user_reservation).exists():
             # In case the user's cart already has a guest associated, let's update it.
             update_view_url = reverse('update_guest', kwargs={'uuid': kwargs.get('uuid')})
             return redirect(update_view_url)
@@ -113,12 +118,12 @@ class CreateGuest(generic.CreateView):
     def form_valid(self, form):
         # Your form validation logic, e.g., saving the form data
         # Don't forget to add the cart field.
-
+        user_reservation = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         # Create a new instance of the Guest model with form data
         guest_instance = form.save(commit=False)
 
-        # Assign the user's cart to the guest_instance
-        guest_instance.user_cart = self.request.user.cart
+        # Assign the user's reservation to the guest_instance
+        guest_instance.user_cart = user_reservation
 
         # Save the guest_instance to the database
         guest_instance.save()
@@ -134,17 +139,17 @@ class UpdateGuest(generic.UpdateView):
     template_name = 'booking/update_guest_details.html'
 
     def get_success_url(self):
-        user_cart = self.request.user.cart
+        user_cart = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         return reverse('confirm_reservation', kwargs={'uuid': user_cart.uuid})
 
     def get_object(self):
-        user_cart = ReservationCart.objects.get(uuid = self.kwargs['uuid'])
+        user_cart = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         return Guest.objects.get(user_cart=user_cart)
     
     def dispatch(self, request, *args, **kwargs):
         # Check if the user has a cart, and if the cart of this template is his.
-        get_object_or_404(ReservationCart, uuid=self.request.user.cart.uuid) # This is the uuid at the end of the url.
-
+        # This is the uuid at the end of the url.
+        return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         return super().dispatch(request, *args, **kwargs)
 
 class ConfirmReservation(generic.DetailView):
@@ -155,7 +160,7 @@ class ConfirmReservation(generic.DetailView):
     
     def get_object(self):
         # Retrieve the cart specified in the url.
-        return get_object_or_404(ReservationCart, uuid=self.kwargs['uuid'])
+        return return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
     
     def dispatch(self, request, *args, **kwargs):
         reservation_cart = self.get_object()
@@ -178,19 +183,19 @@ instance.
 
 the return template is a template which confirms everything went smooth. If there's an error we'll notify it.
 
-The error can't be either there's no room available, or the credit_card specified is invalid, or both.
+The error can be either there's no room available, or the credit_card specified is invalid, or both.
 
 """
 
 def confirm_reservation_done(request, uuid):
-    reservation = get_object_or_404(ReservationCart, uuid=uuid)
+    reservation = return_reservation_object(request=request, uuid=uuid)
     context = {
         'reservation': reservation, 
         'guest_details': get_object_or_404(Guest, user_cart=reservation), # This ensure there's a guest detail.
-            }
+        }
     success = True
 
-    if reservation.user != request.user or reservation != request.user.cart:
+    if reservation.user != request.user:
         return HttpResponseForbidden('No eres el dueÑo de esta reservación')
     
     if not reservation.room_type.is_there_room_available(reservation.check_in_date, reservation.check_out_date):
@@ -220,4 +225,3 @@ def confirm_reservation_done(request, uuid):
     send_confirmation_email(request, reservation)
 
     return render(request, 'booking/confirm_reservation_done.html', context)
-    return HttpResponse('La reservación ha sido exitosa, revise su correo para que vea su confirmación.')
