@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 from accounts.models import CustomUser
+from django.db.models import Q
 
 # Create your models here.
 
@@ -25,6 +26,18 @@ class RoomType(models.Model):
     
     price = models.DecimalField(max_digits=6, decimal_places=2)
 
+    def get_available_rooms(self, r_check_in_date, r_check_out_date):
+        return Room.objects.filter(
+                type = self.room_type_id,
+            ).exclude(
+                room_id__in = RoomReservations.objects.filter(
+                    Q(check_out_date__gt=r_check_in_date) & Q(check_in_date__lt=r_check_out_date))
+                    .values('room_id')
+            )
+    
+    def is_there_room_available(self, r_check_in_date, r_check_out_date):
+        return len(self.get_available_rooms(r_check_in_date, r_check_out_date)) > 0
+    
     def __str__(self):
         return self.type
 
@@ -40,6 +53,9 @@ class Room(models.Model):
     building = models.IntegerField(default=1)
 
     avaliability = models.BooleanField(default=True)
+
+    # When a user reserves a room, but it hasnt been confirmed this becomes True, so no one else steals the room.
+    # When the reservation is confirmed that this will return to false.
 
     type = models.ForeignKey(
         RoomType,
@@ -103,6 +119,13 @@ class Room(models.Model):
 """ReservationCart means the cart of a reservation that is in progress but has not been paid or confirmed"""
 class ReservationCart(models.Model):
     id = models.AutoField(primary_key=True)
+    
+    uuid = models.UUIDField(
+        default = uuid.uuid4,
+        editable = False,
+        unique = True,
+        null=True
+    ) # With this we keep track of the user_cart in the urls.
 
     user = models.OneToOneField(
         CustomUser, on_delete=models.CASCADE,
@@ -110,11 +133,64 @@ class ReservationCart(models.Model):
         unique=True,
         editable=False,
         null=False,
-    )
+    ) # This way the user can acces its cart with user.cart.
 
+    adults = models.IntegerField(null=True, default=0)
+    children = models.IntegerField(null=True, default=0)
     check_in_date = models.DateField(null=False)
     check_out_date = models.DateField(null=False)
-    # This way the user can acces its cart with user.cart.
+
+    nights = models.IntegerField(null=True)
+
+    reservation_price = models.DecimalField(decimal_places=2, max_digits=8, null=True)
+    taxes = models.DecimalField(decimal_places=2, max_digits=8, null=True)
+    total_price = models.DecimalField(decimal_places=2, max_digits=8, null=True)
+
+    room_type = models.ForeignKey(
+        RoomType,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+
+    room = models.ForeignKey(
+        Room,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+
+    def set_cart_info(self):
+         self.nights = (self.check_out_date - self.check_in_date).days - 1
+         self.reservation_price = float(self.nights * self.room_type.price)
+         self.taxes = float(self.reservation_price) * 0.20 # HERE DEFINE A TAXES CALCULATOR!
+         self.total_price = self.reservation_price + self.taxes
+         self.save()
+    
+    def __str__(self):
+        return f"Cart of {self.user.name}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
+
+# This table will relate to the user cart, it contains the guest info and card info.
+class Guest(models.Model):
+    user_cart = models.OneToOneField(
+        ReservationCart,
+        related_name='guest',
+        on_delete=models.CASCADE,
+        editable=False,
+        null=True,
+    )
+
+    name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField(null=True)
+
+    country = models.CharField(max_length=255)
+    postal_code = models.CharField(max_length=20)  # Adjust max_length based on your requirements
+    card_number = models.CharField(max_length=16)  # Assuming a typical credit card number length
+    expire_date = models.CharField(max_length=7)   # Assuming MM/YYYY format for expiration date
+    csv = models.CharField(max_length=4)           # Assuming a typical CSV length
+
+    def __str__(self):
+        return f'{self.name} {self.last_name}'
+    
 
 """Room Reservations refers to the tables that contain all the reservations that have been made to a room."""
 class RoomReservations(models.Model):

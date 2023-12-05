@@ -1,0 +1,10 @@
+{% extends '_base.html' %}
+{% block title %}Confirmar reservación{% endblock title %}
+
+{% block content %}
+<h1>Tu estadia</h1>
+{{reservation}}
+<h1>Detalles del huésped</h1>
+{{reservation.guest}}
+
+{% endblock content %}
