@@ -3,6 +3,8 @@ import uuid
 from accounts.models import CustomUser
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.core.mail import EmailMessage
+import booking_project.settings as settings
 
 # Create your models here.
 
@@ -51,12 +53,6 @@ class Room(models.Model):
         unique = True
     )
     number = models.IntegerField(null=False) # Number identifies floor.
-    building = models.IntegerField(default=1)
-
-    avaliability = models.BooleanField(default=True)
-
-    # When a user reserves a room, but it hasnt been confirmed this becomes True, so no one else steals the room.
-    # When the reservation is confirmed that this will return to false.
 
     type = models.ForeignKey(
         RoomType,
@@ -68,7 +64,6 @@ class Room(models.Model):
         return str(self.number)
 
 
-    
 class Image(models.Model):
     room_type = models.ForeignKey(
         RoomType,
@@ -95,8 +90,8 @@ class Image(models.Model):
 # If he doesnt have a cart we create one, with a unique identifier which could be the reservation number.
 
 """ReservationCart means the cart of a reservation that is in progress but has not been paid or confirmed"""
-class ReservationCart(models.Model):
-    id = models.AutoField(primary_key=True)
+class Reservation(models.Model):
+    reservation_id = models.AutoField(primary_key=True)
 
     # With the combination of an UUID and the guest name we'll create the identifier.
     reservation_confirmation_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -141,23 +136,44 @@ class ReservationCart(models.Model):
 
     completed = models.BooleanField(default=False)
 
+    """This set's the reservation information, as its price, its taxes and calculates total price."""
     def set_cart_info(self):
          self.nights = (self.check_out_date - self.check_in_date).days - 1
          self.reservation_price = float(self.nights * self.room_type.price)
          self.taxes = float(self.reservation_price) * 0.20 # HERE DEFINE A TAXES CALCULATOR!
          self.total_price = self.reservation_price + self.taxes
          self.save()
-    
+
+    """This creates a unique identifier for the reservation."""
     def create_unique_identifier(self):
         self.unique_identifier = f"{self.guest.country}{self.reservation_confirmation_uuid}-{self.guest.name}"
+
+    """Sends the confirmation email, this is the last step in a reservation."""
+    def send_confirmation_email(self):
+        # First create an identifier.
+        self.create_unique_identifier()
+        self.save()
+        # Create an EmailMessage object.
+        email = EmailMessage(
+            subject= f"{self.guest.name} aquí tiene su confirmación de reserva en CoralBlanco",
+            body = f"<h1>{self.unique_identifier}</h1>",
+            from_email= settings.DEFAULT_FROM_EMAIL,
+            to = [self.guest.email],
+        )
+        # Set the content type to HTML
+        email.content_subtype = 'html'
+        # Send the email
+        email.send()
+        # Set this reservation as complete.
+        self.completed = True
     
     def __str__(self):
         return f"Reservation of {self.user.username}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
 
 # This table will relate to the user cart, it contains the guest info and card info.
 class Guest(models.Model):
-    user_cart = models.OneToOneField(
-        ReservationCart,
+    user_reservation = models.OneToOneField(
+        Reservation,
         related_name='guest',
         on_delete=models.CASCADE,
         editable=False,
@@ -186,7 +202,7 @@ class RoomReservations(models.Model):
         Room, on_delete = models.CASCADE,
     ) # with this we can know the type, and price.
     reservation = models.ForeignKey(
-        ReservationCart,
+        Reservation,
         on_delete=models.CASCADE,
         null=True
     )

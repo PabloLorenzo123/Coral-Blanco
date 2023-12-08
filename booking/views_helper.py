@@ -1,5 +1,5 @@
 """This file is for the definition of the classes which will be used in search_results"""
-from .models import ReservationCart
+from .models import Reservation
 from django.shortcuts import get_object_or_404
 
 class RoomSearch:
@@ -25,7 +25,7 @@ class RoomSearch:
 
 """This function creates a Reservation, and returns the object."""
 def create_reservation(request, r_adults, r_children, r_check_in_date, r_check_out_date):
-    ReservationCart.objects.create(
+    Reservation.objects.create(
             user=request.user,
             adults = r_adults,
             children = r_children,
@@ -35,12 +35,12 @@ def create_reservation(request, r_adults, r_children, r_check_in_date, r_check_o
     
     print("User cart created")
     # Return the only reservation which isn't completed.
-    return get_object_or_404(ReservationCart, user=request.user, completed=False)
+    return get_object_or_404(Reservation, user=request.user, completed=False)
 
 """This function, see all the reservations the user has. If he has a un uncompleted one it gets deleted, and a new one is created.
 But the ones that were completed remain. At the end this return a Reservation object."""
 def update_user_reservation_if_neccesary(request, r_adults, r_children, r_check_in_date, r_check_out_date):
-    user_reservation = ReservationCart.objects.filter(user=request.user, completed=False)
+    user_reservation = Reservation.objects.filter(user=request.user, completed=False)
     # If there exist an uncompleted reservation.
     if user_reservation.exists():
         # If the user has many reservations incompleted then we delete them.
@@ -54,4 +54,4 @@ def update_user_reservation_if_neccesary(request, r_adults, r_children, r_check_
     
 """This function returns the current reservation instance."""
 def return_reservation_object(request, uuid):
-    return get_object_or_404(ReservationCart, user=request.user, completed=False, uuid=uuid)
+    return get_object_or_404(Reservation, user=request.user, completed=False, uuid=uuid)

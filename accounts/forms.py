@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from allauth.account.forms import SignupForm
 
-#THIS FORM IS USED.
+# THIS FORM IS USED IN MY INFORMATION.HTML
 class CustomUserChangeForm(UserChangeForm):
     birthdate = forms.DateField( widget=forms.DateInput(attrs={'type': 'date'}), required=False)
     name = forms.CharField(max_length=30, label='Name', required=False)

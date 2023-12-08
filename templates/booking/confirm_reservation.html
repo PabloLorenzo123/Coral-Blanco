@@ -3,8 +3,8 @@
 
 {% block content %}
 <h1>Tu estadia</h1>
-{{reservation}}
+{{user_reservation}}
 <h1>Detalles del huésped</h1>
-{{reservation.guest}}
-<button><a href="{% url 'confirm_reservation_done' reservation.uuid %}">Confirmar</a></button>
+{{user_reservation.guest}}
+<button><a href="{% url 'confirm_reservation_done' user_reservation.uuid %}">Confirmar</a></button>
 {% endblock content %}
