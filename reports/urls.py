@@ -6,6 +6,6 @@ from .views import (
 )
 
 urlpatterns = [
-    path('room_form', ReportTemplateView.as_view(), name='reports'),
+    path('report_form', ReportTemplateView.as_view(), name='reports'),
     path('download_report', reports, name='download_report'),
 ]

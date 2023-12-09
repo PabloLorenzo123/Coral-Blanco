@@ -4,6 +4,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Q
+from datetime import datetime
 import csv
 
 from booking.models import RoomType, Room, RoomReservations
@@ -24,11 +25,11 @@ def report(request, start_date, end_date):
     obj = request.GET.get('object')
 
     # Send response
-    response = HttpResponse(content_type='text/csv')
+    response = HttpResponse(content_type='text/csv;')
     
     # Get file name according to the class and update response
-    filenames = {'room_types' : 'room_types', 'rooms' : 'rooms', 'reservations': 'reservations'}
-    response['Content-Disposition'] = 'attachment; filename=' + str(filenames[obj_class[obj]]) + '.csv'
+    filenames = {'room_types' : 'Room_types', 'rooms' : 'Rooms', 'reservations': 'Reservations'}
+    response['Content-Disposition'] = f'attachment; filename={str(filenames[obj])} {str(datetime.now().date().strftime("%m-%d-%Y"))}.csv'
 
     # Writer
     writer = csv.writer(response)
@@ -49,26 +50,25 @@ def report(request, start_date, end_date):
         'rooms': ['Number', 'Building', 'Avaliability', 'Type'],
         'reservations': ['Room', 'Adults', 'Children', 'Total Price', 'Check In', 'Check Out']
     }
-
     writer.writerow(headers[obj])
+
+    
     attributes = {
-        'room_types': ['__str__', 'short_description', 'max_adults', 'max_children'],
+        'room_types': ['', 'short_description','description', 'max_adults', 'max_children'],
         'rooms': ['number', 'building', 'availability', 'room_type'],
         'reservations': ['room', 'adults', 'children', 'total_price', 'check_in_date', 'check_out_date']
     }
 
     # Populate the CSV
     for r in rs:
- 
         row = []
         for att in attributes[obj]:
-            print(attributes[obj])
-            row.append(str(getattr(r, att, None)))
-            print(row)
+            row.append(str(getattr(r, att, str(r))))
 
         writer.writerow(row)
 
     return response
+
 
 @user_passes_test(lambda user: user.is_superuser)
 def reports(request):

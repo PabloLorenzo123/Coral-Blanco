@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import RoomType, Room, Image, ReservationCart, RoomReservations, Guest, Feature
+from .models import RoomType, Room, Image, ReservationCart, RoomReservations, Guest, Feature, RoomFeature
 
 # Register your models here.
 class ImageInline(admin.TabularInline):
