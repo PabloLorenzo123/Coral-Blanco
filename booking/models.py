@@ -166,6 +166,7 @@ class Reservation(models.Model):
         email.send()
         # Set this reservation as complete.
         self.completed = True
+        self.save()
     
     def __str__(self):
         return f"Reservation of {self.user.username}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 

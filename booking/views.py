@@ -1,3 +1,7 @@
+from typing import Any
+from django import http
+from django.db import models
+import stripe
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
 from django.http import HttpResponseForbidden, HttpResponse
@@ -7,6 +11,7 @@ from .models import RoomType, Reservation, Guest, RoomReservations
 from .forms import GuestForm
 from .views_helper import RoomSearch, update_user_reservation_if_neccesary, return_reservation_object
 from .confirm_reservation_helper import charge_card, send_confirmation_email
+import booking_project.settings as settings
 
 # Create your views here.
 class RoomDetailView(generic.DetailView):
@@ -148,10 +153,17 @@ class UpdateGuest(generic.UpdateView):
         return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         return super().dispatch(request, *args, **kwargs)
 
+
+"""Confirm reservation"""
 class ConfirmReservation(generic.DetailView):
     model = Reservation
     template_name = "booking/confirm_reservation.html"
     context_object_name = "user_reservation"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['stripe_key'] = settings.STRIPE_TEST_PUBLISHABLE_KEY
+        return context
     
     def get_object(self):
         # Retrieve the cart specified in the url.
@@ -164,7 +176,11 @@ class ConfirmReservation(generic.DetailView):
             return HttpResponseForbidden("You do not have permission to view this page.")
 
         return super().dispatch(request, *args, **kwargs)
+
+
+stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
     
+
 """Confirm_reservation_done, is used when the the confirm button is clicked on the last template
 This function needs to send a html email, with the details of the reservation to the email specified 
 in the guest (which is related to the ReservationCart table).
@@ -182,33 +198,33 @@ The error can be either there's no room available, or the credit_card specified 
 
 """
 
-def confirm_reservation_done(request, uuid):
-    user_reservation = return_reservation_object(request=request, uuid=uuid)
-
+def payment_confirm_reservation_done(request, uuid):   
+    user_reservation = return_reservation_object(request, uuid)
+    # Defining the context.
     context = {
         'user_reservation': user_reservation, 
         'guest_details': get_object_or_404(Guest, user_reservation=user_reservation), # This ensure there's a guest detail.
         }
-    success = True
-
-    if user_reservation.user != request.user:
-        return HttpResponseForbidden('No eres el dueÑo de esta reservación')
-    
+    # Checking there's a room available before paying.
     if not user_reservation.room_type.is_there_room_available(user_reservation.check_in_date, user_reservation.check_out_date):
-        success = False
         user_reservation.delete()
         return HttpResponse('Ya no hay habitación disponible, intentelo denuevo.')
-    
-    # Charge the $0 dollars to the guest account.
-    if not charge_card(request):
-        success = False
-        user_reservation.delete()
-        return HttpResponse('La información bancaria ofrecida no es valida, intentelo denuevo.')
-    
+    # Try to process the payment.
+    try:
+        if request.method == 'POST':
+            charge = stripe.Charge.create(
+            amount=3900,
+            currency='usd',
+            description='Purchase all books',
+            source=request.POST['stripeToken']
+        )
+    except:
+        return HttpResponse('No se pudo procesar el pago, intentelo denuevo.')
     # Assign room to the reservation.
-    user_reservation.room = user_reservation.room_type.get_available_rooms(user_reservation.check_in_date, user_reservation.check_out_date)[0]
+    user_reservation.room = user_reservation.room_type.get_available_rooms(
+        user_reservation.check_in_date, user_reservation.check_out_date
+        )[0]
     # Complete the reservation. Once complete all the links behind are not accesible.
-
     # Create RoomReservation, to keep track the reservations of a room.
     RoomReservations.objects.create(
         room=user_reservation.room,
@@ -216,7 +232,22 @@ def confirm_reservation_done(request, uuid):
         check_in_date = user_reservation.check_in_date,
         check_out_date = user_reservation.check_out_date,
     )
-    # Send email.
+    # Send confirmation email.
     user_reservation.send_confirmation_email()
-
+ 
     return render(request, 'booking/confirm_reservation_done.html', context)
+
+class ReservationDetail(generic.DetailView):
+    model = Reservation
+    context_object_name = 'user_reservation'
+    template_name = 'confirmed_reservation_detail.html'
+
+    def get_object(self):
+        return get_object_or_404(Reservation, user=self.request.user, uuid=self.kwargs['uuid'], completed=True)
+    
+    def dispatch(self, request, *args, **kwargs):
+        user_reservation = self.get_object()
+        # Check if the logged-in user is the owner of the cart
+        if request.user != user_reservation.user:
+            return HttpResponseForbidden("You do not have permission to view this page.")
+        return super().dispatch(request, *args, **kwargs)

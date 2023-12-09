@@ -6,5 +6,16 @@
 {{user_reservation}}
 <h1>Detalles del huésped</h1>
 {{user_reservation.guest}}
-<button><a href="{% url 'confirm_reservation_done' user_reservation.uuid %}">Confirmar</a></button>
+<p>Para confirmar la reservación, pague</p>
+<form action="{% url 'confirm_reservation_done' user_reservation.uuid %}" method="post">
+    {% csrf_token %}
+    <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+    data-key="{{ stripe_key }}"
+    data-description="All Books"
+    data-amount="3900"
+    data-locale="auto">
+    </script>
+</form>
+    
+
 {% endblock content %}
