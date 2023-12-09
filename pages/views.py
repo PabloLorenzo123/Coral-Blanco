@@ -7,8 +7,4 @@ from booking.models import RoomType
 class HomePageView(TemplateView):
     template_name = 'home.html'
 
-class SearchPageView(ListView):
-    model = RoomType
-    template_name = 'home.html'
-    context_object_name = 'room_types'
     

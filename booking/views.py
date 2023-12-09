@@ -1,6 +1,3 @@
-from typing import Any
-from django import http
-from django.db import models
 import stripe
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
@@ -24,12 +21,20 @@ class RoomDetailView(generic.DetailView):
         # I'm updating the get_object method so it uses the uuid instead of the pk.
         return RoomType.objects.get(uuid=self.kwargs['uuid'])
 
+    
+class RoomsListView(generic.ListView):
+    model = RoomType
+    template_name = 'rooms.html'
+    context_object_name = 'room_types'
+
+
 """This function is executed when the search room button is clicked, its job is to create a new reservation for the user
 and display the rooms that are available.
 - First you need to get the search room fields values, create a reservation with that data.
 - Then look for each type of room, and check if it has the capacity requested.
 - Then see if there're room available with no booking between the dates requested.
 - Return a dictionary of all the rooms, indicating if they're available or not, and why."""  
+      
 def search_room(request):
     # first check the user is logged in, with @loginrequired.
     r_adults = int(request.GET.get('adults'))
@@ -177,10 +182,6 @@ class ConfirmReservation(generic.DetailView):
 
         return super().dispatch(request, *args, **kwargs)
 
-
-stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
-    
-
 """Confirm_reservation_done, is used when the the confirm button is clicked on the last template
 This function needs to send a html email, with the details of the reservation to the email specified 
 in the guest (which is related to the ReservationCart table).
@@ -197,7 +198,7 @@ the return template is a template which confirms everything went smooth. If ther
 The error can be either there's no room available, or the credit_card specified is invalid, or both.
 
 """
-
+stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 def payment_confirm_reservation_done(request, uuid):   
     user_reservation = return_reservation_object(request, uuid)
     # Defining the context.

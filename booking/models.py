@@ -8,7 +8,6 @@ import booking_project.settings as settings
 
 # Create your models here.
 
-
 """Room and Images"""
 class RoomType(models.Model):
     room_type_id = models.AutoField(primary_key=True) # to save space with foreign keys.
@@ -20,7 +19,7 @@ class RoomType(models.Model):
     )
 
     type = models.CharField(max_length=255, unique=True)
-    # With RoomType.objects[x].images can acces its images.
+    # With RoomType.objects[x].images can access its images.
     short_description = models.TextField(blank=True, null=True)
     description = models.TextField()
 
@@ -47,11 +46,6 @@ class RoomType(models.Model):
 class Room(models.Model):
     room_id = models.AutoField(primary_key=True)
 
-    uuid = models.UUIDField(
-        default = uuid.uuid4,
-        editable = False,
-        unique = True
-    )
     number = models.IntegerField(null=False) # Number identifies floor.
 
     type = models.ForeignKey(
@@ -62,7 +56,6 @@ class Room(models.Model):
 
     def __str__(self):
         return str(self.number)
-
 
 class Image(models.Model):
     room_type = models.ForeignKey(
@@ -82,14 +75,27 @@ class Image(models.Model):
     def __str__(self):
         return self.alt
 
-"""Reservation and cart"""
-# All Users have a unique cart.
-# we have to make sure everytime a user signup they have a cart.
-# We can do this checking before making the search check if the user has a cart if he doesnt create one then.
-# When user clicks search if he has already a cart we delete it, then create one.
-# If he doesnt have a cart we create one, with a unique identifier which could be the reservation number.
+class Feature(models.Model):
+    feature = models.CharField(max_length=100)
+    icon = models.CharField(max_length=100, default="")
+    
+    def __str__(self):
+        return self.feature
 
-"""ReservationCart means the cart of a reservation that is in progress but has not been paid or confirmed"""
+class RoomFeature(models.Model):
+    room_type = models.ForeignKey(
+        RoomType,
+        on_delete=models.CASCADE,
+        related_name='features'
+    )
+    feature = models.ForeignKey(
+        Feature,
+        on_delete=models.CASCADE,
+        related_name='room_types'
+    )
+
+
+"""Reservation"""
 class Reservation(models.Model):
     reservation_id = models.AutoField(primary_key=True)
 
@@ -171,7 +177,7 @@ class Reservation(models.Model):
     def __str__(self):
         return f"Reservation of {self.user.username}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
 
-# This table will relate to the user cart, it contains the guest info and card info.
+# This table will relate to the user's reservation, it contains the guest info.
 class Guest(models.Model):
     user_reservation = models.OneToOneField(
         Reservation,

@@ -1,0 +1,46 @@
+{% extends '_base.html' %}
+
+{% block title %}Hotel{% endblock title %}
+
+{% block content %}
+    <div class="pt-4">
+    {% for type in room_types %}
+        <div class="card mb-4 shadow" style="height: 250px;">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="{{ type.images.all.0.image.url }}" class="img-fluid rounded-start" style="object-fit: cover; height: 250px;">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body pl-5">
+                        <div class="row">
+                            <h5 class="card-title">
+                                {{ type.type }}
+                                <a class="link-info mx-lg-5" href="{% url 'room_detail' type.uuid %}">Detalles</a>
+                            </h5>
+                            <p class="card-text">{{ type.short_description }}</p>
+                        </div> 
+                        <div class="row">
+                            <ul class="list-unstyled pt-4">
+                                {% for feature in type.features.all %}
+                                    {% if forloop.counter <= 3 %}
+                                        <li class="d-flex">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-check" style="color: gray;"></i>
+                                                <p class="card-text mx-2">{{ feature.feature.feature }}</p>
+                                            </div>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="text-end">
+                            <button class="btn btn-outline-success btn-lg">Reservar</button>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+{% endblock content %}
