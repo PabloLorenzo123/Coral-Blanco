@@ -4,49 +4,53 @@
 
 {% block search_bar %}
 <!-- Room searchbar -->
-<form class="row bg-light p-2" action="{% url 'search_room' %}" method="get">
-    <div class="row">
-        <!--Dates-->
-        <div class="col input-group">
-            <input name="check_in_date" type="date" class="form-control">
-            <input name="check_out_date" type="date" class="form-control">
-        </div>
-        
-        <div class="col">
-            <!--Rooms-->
-            <div class="row">
-                <div class="col input-group">
-                    <i class="fas fa-bed input-group-text"></i>
-                    <select name="number_of_rooms" class="form-select" >
-                        <option selected>Open this select menu</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                    </select>
+    <form class="row bg-light p-2" action="{% url 'search_room' %}" method="get">
+        <div class="row">
+            <!--Dates-->
+            <div class="col input-group">
+                <input name="check_in_date" type="date" class="form-control">
+                <input name="check_out_date" type="date" class="form-control">
+            </div>
+            
+            <div class="col">
+                <!--Rooms-->
+                <div class="row">
+                    <div class="col input-group">
+                        <i class="fas fa-bed input-group-text"></i>
+                        <select name="number_of_rooms" class="form-select" >
+                            <option selected>Open this select menu</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                    <!-- adults -->
+                    <div class="col input-group">
+                        <i class="fas fa-user-friends input-group-text"></i>
+                        <select name="adults" class="form-select" >
+                            <option selected>Open this select menu</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <!--Children-->
+                    <div class="col input-group">
+                        <i class="fas fa-user-friends input-group-text"></i>
+                        <select name="children" class="form-select">
+                            <option selected>Open this select menu</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
                 </div>
-                <!-- adults -->
-                <div class="col input-group">
-                    <i class="fas fa-user-friends input-group-text"></i>
-                    <select name="adults" class="form-select" >
-                        <option selected>Open this select menu</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                        <option value="4">Four</option>
-                        <option value="5">Five</option>
-                    </select>
-                </div>
-                <!--Children-->
-                <div class="col input-group">
-                    <i class="fas fa-user-friends input-group-text"></i>
-                    <select name="children" class="form-select">
-                        <option selected>Open this select menu</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                        <option value="4">Four</option>
-                    </select>
-                </div>
+            </div>
+            <div class="col input-group">
+                <button class="btn btn-success">Buscar</button>
             </div>
         </div>
         <div class="col input-group">

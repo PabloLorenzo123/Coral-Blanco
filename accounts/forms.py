@@ -3,18 +3,19 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from allauth.account.forms import SignupForm
 
-#THIS FORM IS USED.
+# THIS FORM IS USED IN MY INFORMATION.HTML
 class CustomUserChangeForm(UserChangeForm):
-    birthdate = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date'}),
-        required=False
-    )
+    birthdate = forms.DateField( widget=forms.DateInput(attrs={'type': 'date'}), required=False)
+    name = forms.CharField(max_length=30, label='Name', required=False)
+    last_name = forms.CharField(max_length=30, label='Last Name', required=False)
+    country = forms.CharField(max_length=30, label='Country', required=False)
+
     class Meta:
         model = get_user_model()
         fields = (
             "name",
             "last_name",
-            "birthdate",
+            "birthdate", # it works if i delete this.
             "address",
             "country",
             "phone_number",

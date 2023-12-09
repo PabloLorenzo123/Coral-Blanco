@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import RoomType, Room, Image, ReservationCart, RoomReservations, Guest, Feature, RoomFeature
+from .models import RoomType, Room, Image, Reservation, RoomReservations, Guest, Feature, RoomFeature
 
 # Register your models here.
 class ImageInline(admin.TabularInline):
@@ -20,7 +20,7 @@ class RoomTypeAdmin(admin.ModelAdmin):
 admin.site.register(RoomType, RoomTypeAdmin)
 admin.site.register(Room)
 admin.site.register(Image)
-admin.site.register(ReservationCart)
+admin.site.register(Reservation)
 admin.site.register(RoomReservations)
 admin.site.register(Feature)
 admin.site.register(Guest)

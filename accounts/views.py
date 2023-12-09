@@ -3,9 +3,23 @@ from django.views import generic
 from django.urls import reverse_lazy
 from .models import CustomUser
 from django.contrib.auth.mixins import UserPassesTestMixin
+from allauth.account.views import SignupView
+
 
 from .forms import CustomUserChangeForm
 # Create your views here.
+
+"""Extending allauth signup view to use my form, and redirect to home"""
+class CustomSignupView(SignupView):
+    success_url = reverse_lazy('home')  # Set your home URL or any other desired URL
+
+    def get_success_url(self):
+        return self.success_url
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        # Additional logic if needed
+        return response
 
 # Because allauth doesn't provide it, i'm defining it.
 class UpdateUser(UserPassesTestMixin, generic.UpdateView):

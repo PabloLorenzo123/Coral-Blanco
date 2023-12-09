@@ -43,10 +43,8 @@ INSTALLED_APPS = [
     'booking.apps.BookingConfig',
     'reports.apps.ReportsConfig',
     # Third party apps.
-    # Third party.
     "crispy_forms",
     "crispy_bootstrap5",
-    # Local apps.
     'allauth',
     'allauth.account', # using another table for emails.
 ]
@@ -156,7 +154,8 @@ ACCOUNT_CHANGE_EMAIL = False
 ACCOUNT_SIGNUP_REDIRECT_URL = 'account_login'
 ACCOUNT_LOGIN_REDIRECT_URL = 'home'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'home'
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'home' # This fixes signup redirect.
+LOGOUT_REDIRECT_URL = 'home'
 
 
 
@@ -181,3 +180,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 """Crispy forms and bootstrap"""
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+"""Stripe"""
+STRIPE_TEST_PUBLISHABLE_KEY = 'pk_test_51OLCZILKb9dB8gecVOqM1KvapMIUVkeZTTI1HIlCAR9oOKkQxaa1a63DK49s9b0dsPubZ4WEsEPPpNL8ew2YU76L00B1Jtwi3D'
+STRIPE_TEST_SECRET_KEY = 'sk_test_51OLCZILKb9dB8gecrZV0yMMPdFF1LyXkSIm7955moskcC1eJnQKC6LXuvlySnFxNB10em49Xm512ocUc9WFv5qC000BMEFjGOa'

@@ -8,40 +8,18 @@
     <div class="col">
         <div class="card">
             {% if room.room_can_be_selected %}
-                <div class="row g-0">
-                    <div class="col-md-4">
-                        <img src="{{ room.room_type_object.images.all.0.image.url }}" class="img-fluid rounded-start " style="max-width: 400px; max-height: 400px;" alt="{{room.room_type_object.images.all.0.alt}}>
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body pl-5">
-                            <div class="row">
-                                <h5 class="card-title">{{ type.type }}<a class="link-info m-lg-5" href="{% url 'room_detail' type.uuid %}">Detalles</a></h5>
-                                <p class="card-text">{{ type.short_description }}</p>
-                            </div> 
-                            <div class="text-end pt-lg-5">
-                                <button class="btn btn-outline-success btn-lg">Reservar</button>
-                            </div>
-                            
-                        </div>
-                    </div>
-                </div>
                 <img src="{{room.room_type_object.images.all.0.image.url}}" class="card-img-top" alt="{{room.room_type_object.images.all.0.alt}}">
                 <div class="card-body">
                     <h5 class="card-title">{{room.room_type_object}}</h5>
                     <p class="card-text">{{room.room_type_object.short_description}}</p>
                     <!-- This botton is to reserve, only available to rooms that can be selected -->
-                    {% if user.cart.room_type != room.room_type_object %}
-                    <form method="post" action="{% url 'reservate_room' user.cart.uuid %}">
+                    <form method="post" action="{% url 'reservate_room' user_reservation.uuid %}">
                         {% csrf_token %}
                         <button name='room_type_to_reservate' value={{room.room_type_object.type}}
                         class="btn btn-outline-primary ml-2 btn-lg" type="submit">Reservar</button>
                     </form>
-                    {% else %}
-                    <button class="btn btn-outline-primary ml-2 btn-lg">Ya está seleccionado</button>
                     <!---->
                     <a href="{% url 'room_detail' room.room_type_object.uuid %}">Info</a>
-                    <a href="{% url 'guest_details' user.cart.uuid %}">Siguiente paso</a>
-                    {% endif %}
                 </div>
             {% else %}
                 <img style="filter: grayscale(100%);" src="{{room.room_type_object.images.all.0.image.url}}" class="card-img-top" alt="{{room.room_type_object.images.all.0.alt}}">

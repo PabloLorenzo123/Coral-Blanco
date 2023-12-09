@@ -2,9 +2,11 @@ from django.db import models
 import uuid
 from accounts.models import CustomUser
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.core.mail import EmailMessage
+import booking_project.settings as settings
 
 # Create your models here.
-
 
 """Room and Images"""
 class RoomType(models.Model):
@@ -44,18 +46,7 @@ class RoomType(models.Model):
 class Room(models.Model):
     room_id = models.AutoField(primary_key=True)
 
-    uuid = models.UUIDField(
-        default = uuid.uuid4,
-        editable = False,
-        unique = True
-    )
     number = models.IntegerField(null=False) # Number identifies floor.
-    building = models.IntegerField(default=1)
-
-    avaliability = models.BooleanField(default=True)
-
-    # When a user reserves a room, but it hasnt been confirmed this becomes True, so no one else steals the room.
-    # When the reservation is confirmed that this will return to false.
 
     type = models.ForeignKey(
         RoomType,
@@ -66,8 +57,6 @@ class Room(models.Model):
     def __str__(self):
         return str(self.number)
 
-
-    
 class Image(models.Model):
     room_type = models.ForeignKey(
         RoomType,
@@ -86,52 +75,45 @@ class Image(models.Model):
     def __str__(self):
         return self.alt
 
-"""Room and Images"""
-class Room(models.Model):
-    room_id = models.AutoField(primary_key=True)
+class Feature(models.Model):
+    feature = models.CharField(max_length=100)
+    icon = models.CharField(max_length=100, default="")
+    
+    def __str__(self):
+        return self.feature
 
-    uuid = models.UUIDField(
-        default = uuid.uuid4,
-        editable = False,
-        unique = True
-    )
-    number = models.IntegerField(null=False) # Number identifies floor.
-    building = models.IntegerField(default=1)
-
-    avaliability = models.BooleanField(default=True)
-
-    type = models.ForeignKey(
+class RoomFeature(models.Model):
+    room_type = models.ForeignKey(
         RoomType,
         on_delete=models.CASCADE,
-        related_name="room_type",
+        related_name='features'
+    )
+    feature = models.ForeignKey(
+        Feature,
+        on_delete=models.CASCADE,
+        related_name='room_types'
     )
 
-    def __str__(self):
-        return str(self.number)
 
-"""Reservation and cart"""
-# All Users have a unique cart.
-# we have to make sure everytime a user signup they have a cart.
-# We can do this checking before making the search check if the user has a cart if he doesnt create one then.
-# When user clicks search if he has already a cart we delete it, then create one.
-# If he doesnt have a cart we create one, with a unique identifier which could be the reservation number.
+"""Reservation"""
+class Reservation(models.Model):
+    reservation_id = models.AutoField(primary_key=True)
 
-"""ReservationCart means the cart of a reservation that is in progress but has not been paid or confirmed"""
-class ReservationCart(models.Model):
-    id = models.AutoField(primary_key=True)
-    
+    # With the combination of an UUID and the guest name we'll create the identifier.
+    reservation_confirmation_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    unique_identifier = models.CharField(max_length=70, null=True)
+
     uuid = models.UUIDField(
         default = uuid.uuid4,
         editable = False,
         unique = True,
-        null=True
     ) # With this we keep track of the user_cart in the urls.
 
-    user = models.OneToOneField(
-        CustomUser, on_delete=models.CASCADE,
+    user = models.ForeignKey(
+        CustomUser,
         related_name="cart",
-        unique=True,
         editable=False,
+        on_delete=models.CASCADE,
         null=False,
     ) # This way the user can acces its cart with user.cart.
 
@@ -158,20 +140,47 @@ class ReservationCart(models.Model):
         null=True,
     )
 
+    completed = models.BooleanField(default=False)
+
+    """This set's the reservation information, as its price, its taxes and calculates total price."""
     def set_cart_info(self):
          self.nights = (self.check_out_date - self.check_in_date).days - 1
          self.reservation_price = float(self.nights * self.room_type.price)
          self.taxes = float(self.reservation_price) * 0.20 # HERE DEFINE A TAXES CALCULATOR!
          self.total_price = self.reservation_price + self.taxes
          self.save()
+
+    """This creates a unique identifier for the reservation."""
+    def create_unique_identifier(self):
+        self.unique_identifier = f"{self.guest.country}{self.reservation_confirmation_uuid}-{self.guest.name}"
+
+    """Sends the confirmation email, this is the last step in a reservation."""
+    def send_confirmation_email(self):
+        # First create an identifier.
+        self.create_unique_identifier()
+        self.save()
+        # Create an EmailMessage object.
+        email = EmailMessage(
+            subject= f"{self.guest.name} aquí tiene su confirmación de reserva en CoralBlanco",
+            body = f"<h1>{self.unique_identifier}</h1>",
+            from_email= settings.DEFAULT_FROM_EMAIL,
+            to = [self.guest.email],
+        )
+        # Set the content type to HTML
+        email.content_subtype = 'html'
+        # Send the email
+        email.send()
+        # Set this reservation as complete.
+        self.completed = True
+        self.save()
     
     def __str__(self):
-        return f"Cart of {self.user.name}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
+        return f"Reservation of {self.user.username}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
 
-# This table will relate to the user cart, it contains the guest info and card info.
+# This table will relate to the user's reservation, it contains the guest info.
 class Guest(models.Model):
-    user_cart = models.OneToOneField(
-        ReservationCart,
+    user_reservation = models.OneToOneField(
+        Reservation,
         related_name='guest',
         on_delete=models.CASCADE,
         editable=False,
@@ -195,40 +204,15 @@ class Guest(models.Model):
 """Room Reservations refers to the tables that contain all the reservations that have been made to a room."""
 class RoomReservations(models.Model):
     id = models.AutoField(primary_key=True)
-    
+
     room = models.ForeignKey(
         Room, on_delete = models.CASCADE,
     ) # with this we can know the type, and price.
-
-    adults = models.IntegerField()
-    children = models.IntegerField()
-
-    total_price = models.IntegerField() # This will be equal to price * day/night.
-
-    cart = models.ForeignKey(
-        ReservationCart, on_delete=models.CASCADE,
-        related_name='room_reserved',
+    reservation = models.ForeignKey(
+        Reservation,
+        on_delete=models.CASCADE,
+        null=True
     )
-    
+    # Can acces the reservation with RoomReservations.reservation.
     check_in_date = models.DateField(null=True)
     check_out_date = models.DateField(null=True) # remember to add null false.
-
-class Feature(models.Model):
-    feature = models.CharField(max_length=100)
-    icon = models.CharField(max_length=100, default="")
-    
-    def __str__(self):
-        return self.feature
-
-class RoomFeature(models.Model):
-    room_type = models.ForeignKey(
-        RoomType,
-        on_delete=models.CASCADE,
-        related_name='features'
-    )
-    feature = models.ForeignKey(
-        Feature,
-        on_delete=models.CASCADE,
-        related_name='room_types'
-    )
-

@@ -1,12 +1,14 @@
+import stripe
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
-from .views_helper import RoomSearch
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.urls import reverse
 
-from .models import RoomType, ReservationCart, Guest
+from .models import RoomType, Reservation, Guest, RoomReservations
 from .forms import GuestForm
-from .views_helper import RoomSearch, update_user_cart_if_different
+from .views_helper import RoomSearch, update_user_reservation_if_neccesary, return_reservation_object
+from .confirm_reservation_helper import charge_card, send_confirmation_email
+import booking_project.settings as settings
 
 # Create your views here.
 class RoomDetailView(generic.DetailView):
@@ -24,6 +26,14 @@ class RoomsListView(generic.ListView):
     model = RoomType
     template_name = 'rooms.html'
     context_object_name = 'room_types'
+
+
+"""This function is executed when the search room button is clicked, its job is to create a new reservation for the user
+and display the rooms that are available.
+- First you need to get the search room fields values, create a reservation with that data.
+- Then look for each type of room, and check if it has the capacity requested.
+- Then see if there're room available with no booking between the dates requested.
+- Return a dictionary of all the rooms, indicating if they're available or not, and why."""  
       
 def search_room(request):
     # first check the user is logged in, with @loginrequired.
@@ -32,11 +42,11 @@ def search_room(request):
     r_check_in_date = request.GET.get('check_in_date')
     r_check_out_date = request.GET.get('check_out_date')
 
-    # check if he has a cart, if it's the same reservation keep the cart the same, if its different update the cart, if he doesnt have one create one.
-    update_user_cart_if_different(request, r_adults, r_children, r_check_in_date, r_check_out_date)
+    # Create a reservation.
+    user_reservation = update_user_reservation_if_neccesary(request, r_adults, r_children, r_check_in_date, r_check_out_date)
 
     # Now find what type of rooms can have this many guests, and if they are available.
-    context = {'room_types': []} 
+    context = {'room_types': [], 'user_reservation': user_reservation} 
 
     for room_type in RoomType.objects.all():
 
@@ -62,28 +72,24 @@ def search_room(request):
 def reservate_now(request, uuid):
     # This is a post request, to add a room to the user's cart.
     # User needs to be logged in, and have a cart (which they're the owner of).
-    user_cart_query = ReservationCart.objects.filter(user=request.user, uuid=uuid)
-    if not user_cart_query.exists():
-        print("This user doesn't pass the testt")
-    
-    user_cart = user_cart_query[0] # because filter returns a queryset and not an object.
+    user_reservation = return_reservation_object(request, uuid)
+    # If return_reservation_object fails it will throw a 404.
 
     # 2. Set room_type of cart to be equal the one requested.
-    room_type_name = request.POST.get('room_type_to_reservate')
-    room_type = RoomType.objects.filter(type=room_type_name)[0] # We do this to get the object of the class.
-
-    user_cart.room_type = room_type
-    user_cart.save()
+    user_reservation.room_type = RoomType.objects.get(
+        type=request.POST.get('room_type_to_reservate')
+        )
+    user_reservation.save()
 
     # 3. We now need to set the info of the cart (total_price, taxes, nights)
-    user_cart.set_cart_info()
-    print(user_cart)
+    user_reservation.set_cart_info()
+    print(user_reservation)
 
     context = {
-        'user_cart': user_cart,
+        'user_reservation': user_reservation,
         }
 
-    return render(request, 'booking/cart_detail.html', context)
+    return render(request, 'booking/reservation_detail.html', context)
 
 class CreateGuest(generic.CreateView):
     model = Guest
@@ -91,8 +97,8 @@ class CreateGuest(generic.CreateView):
     template_name = 'booking/guest_details.html'  # Create an HTML template for the form
 
     def get_success_url(self):
-        user_cart = self.request.user.cart
-        return reverse('confirm_reservation', kwargs={'uuid': user_cart.uuid})
+        user_reservation = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
+        return reverse('confirm_reservation', kwargs={'uuid': user_reservation.uuid})
 
     def get_initial(self):
         # This way the form gets initial values that could haven provided before in the user account, in user_info.
@@ -106,9 +112,9 @@ class CreateGuest(generic.CreateView):
     
     def dispatch(self, request, *args, **kwargs):
         # Check if the user already has a guest associated with their cart
-        cart = ReservationCart.objects.get(uuid=kwargs.get('uuid')) # This is the uuid at the end of the url.
+        user_reservation = return_reservation_object(request=self.request, uuid=kwargs.get('uuid')) # This is the uuid at the end of the url.
 
-        if Guest.objects.filter(user_cart=cart).exists():
+        if Guest.objects.filter(user_reservation=user_reservation).exists():
             # In case the user's cart already has a guest associated, let's update it.
             update_view_url = reverse('update_guest', kwargs={'uuid': kwargs.get('uuid')})
             return redirect(update_view_url)
@@ -118,12 +124,12 @@ class CreateGuest(generic.CreateView):
     def form_valid(self, form):
         # Your form validation logic, e.g., saving the form data
         # Don't forget to add the cart field.
-
+        user_reservation = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         # Create a new instance of the Guest model with form data
         guest_instance = form.save(commit=False)
 
-        # Assign the user's cart to the guest_instance
-        guest_instance.user_cart = self.request.user.cart
+        # Assign the user's reservation to the guest_instance
+        guest_instance.user_reservation = user_reservation
 
         # Save the guest_instance to the database
         guest_instance.save()
@@ -139,33 +145,110 @@ class UpdateGuest(generic.UpdateView):
     template_name = 'booking/update_guest_details.html'
 
     def get_success_url(self):
-        user_cart = self.request.user.cart
-        return reverse('confirm_reservation', kwargs={'uuid': user_cart.uuid})
+        user_reservation = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
+        return reverse('confirm_reservation', kwargs={'uuid': user_reservation.uuid})
 
     def get_object(self):
-        user_cart = ReservationCart.objects.get(uuid = self.kwargs['uuid'])
-        return Guest.objects.get(user_cart=user_cart)
+        user_reservation = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
+        return Guest.objects.get(user_reservation=user_reservation)
     
     def dispatch(self, request, *args, **kwargs):
         # Check if the user has a cart, and if the cart of this template is his.
-        get_object_or_404(ReservationCart, uuid=self.request.user.cart.uuid) # This is the uuid at the end of the url.
-
+        # This is the uuid at the end of the url.
+        return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         return super().dispatch(request, *args, **kwargs)
 
+
+"""Confirm reservation"""
 class ConfirmReservation(generic.DetailView):
-    model = ReservationCart
+    model = Reservation
     template_name = "booking/confirm_reservation.html"
-    context_object_name = "reservation"
-    success_url = ''
+    context_object_name = "user_reservation"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['stripe_key'] = settings.STRIPE_TEST_PUBLISHABLE_KEY
+        return context
     
     def get_object(self):
         # Retrieve the cart specified in the url.
-        return get_object_or_404(ReservationCart, uuid=self.kwargs['uuid'])
+        return return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
     
     def dispatch(self, request, *args, **kwargs):
-        reservation_cart = self.get_object()
+        user_reservation = self.get_object()
         # Check if the logged-in user is the owner of the cart
-        if request.user != reservation_cart.user:
+        if request.user != user_reservation.user:
             return HttpResponseForbidden("You do not have permission to view this page.")
 
+        return super().dispatch(request, *args, **kwargs)
+
+"""Confirm_reservation_done, is used when the the confirm button is clicked on the last template
+This function needs to send a html email, with the details of the reservation to the email specified 
+in the guest (which is related to the ReservationCart table).
+
+- 1. Need to check first that there's still room available. If so the reservation was succesful, if not it was unsuccesful.
+- 2. Then we need to charge 0$ dollars to the credit_card specified to see if it's valid, if the transaction is succesful, then proceed.
+- 3. Then assign a room to the reservation, which will be saved in the ReservationCart.
+- 4. When the reservation is completed, we assign the value completed=true, so when a user gets to make a new reservation he does on another.
+instance.
+- 5. Send the html confirmation email.
+
+the return template is a template which confirms everything went smooth. If there's an error we'll notify it.
+
+The error can be either there's no room available, or the credit_card specified is invalid, or both.
+
+"""
+stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+def payment_confirm_reservation_done(request, uuid):   
+    user_reservation = return_reservation_object(request, uuid)
+    # Defining the context.
+    context = {
+        'user_reservation': user_reservation, 
+        'guest_details': get_object_or_404(Guest, user_reservation=user_reservation), # This ensure there's a guest detail.
+        }
+    # Checking there's a room available before paying.
+    if not user_reservation.room_type.is_there_room_available(user_reservation.check_in_date, user_reservation.check_out_date):
+        user_reservation.delete()
+        return HttpResponse('Ya no hay habitación disponible, intentelo denuevo.')
+    # Try to process the payment.
+    try:
+        if request.method == 'POST':
+            charge = stripe.Charge.create(
+            amount=3900,
+            currency='usd',
+            description='Purchase all books',
+            source=request.POST['stripeToken']
+        )
+    except:
+        return HttpResponse('No se pudo procesar el pago, intentelo denuevo.')
+    # Assign room to the reservation.
+    user_reservation.room = user_reservation.room_type.get_available_rooms(
+        user_reservation.check_in_date, user_reservation.check_out_date
+        )[0]
+    # Complete the reservation. Once complete all the links behind are not accesible.
+    # Create RoomReservation, to keep track the reservations of a room.
+    RoomReservations.objects.create(
+        room=user_reservation.room,
+        reservation=user_reservation,
+        check_in_date = user_reservation.check_in_date,
+        check_out_date = user_reservation.check_out_date,
+    )
+    # Send confirmation email.
+    user_reservation.send_confirmation_email()
+ 
+    return render(request, 'booking/confirm_reservation_done.html', context)
+
+class ReservationDetail(generic.DetailView):
+    model = Reservation
+    context_object_name = 'user_reservation'
+    template_name = 'confirmed_reservation_detail.html'
+
+    def get_object(self):
+        return get_object_or_404(Reservation, user=self.request.user, uuid=self.kwargs['uuid'], completed=True)
+    
+    def dispatch(self, request, *args, **kwargs):
+        user_reservation = self.get_object()
+        # Check if the logged-in user is the owner of the cart
+        if request.user != user_reservation.user:
+            return HttpResponseForbidden("You do not have permission to view this page.")
         return super().dispatch(request, *args, **kwargs)
