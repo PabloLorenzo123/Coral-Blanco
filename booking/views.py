@@ -285,7 +285,7 @@ class MyReservations(LoginRequiredMixin, generic.ListView):
     context_object_name = 'reservations'
 
     def get_queryset(self):
-        return Reservation.objects.filter(user=self.request.user).order_by('-created_at')
+        return Reservation.objects.filter(user=self.request.user, completed=True).order_by('-created_at')
 
 class ReservationDetail(LoginRequiredMixin, generic.DetailView):
     model = Reservation

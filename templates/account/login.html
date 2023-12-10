@@ -2,20 +2,30 @@
 {% block title %}Iniciar sesión{% endblock title %}
 
 {% block content %}
+
 {% if user.is_authenticated %}
+
 <p>Ya estás ingresado</p>
+
 {% else %}
   <div class="p-4 bg-light h-100">
+
     <div class="container border rounded shadow-sm p-4 bg-white">
-      <form>
+
+      <form method="POST" action="{% url 'account_login' %}">
+        {% csrf_token %}
         <div class="mb-3">
           <label class="form-label" for="{{form.login.id_for_label}}">Correo Electrónico</label>
-          <input id="{{form.login.id_for_label}}" name="{{form.login.name}}" type="email" placeholder="example@email.com" class="form-control form-control-lg"/>
+          <input id="{{form.login.id_for_label}}" name="{{form.login.name}}" type="email" 
+          placeholder="example@email.com" class="form-control form-control-lg"/>
         </div>
+
         <div class="mb-3">
           <label class="form-label" for="{{form.password.id_for_label}}">Contraseña</label>
-          <input id="{{form.password.id_for_label}}" name="{{form.password.name}}" type="password" class="form-control form-control-lg" />
+          <input id="{{form.password.id_for_label}}" name="{{form.password.name}}" 
+          type="password" class="form-control form-control-lg" />
         </div>
+
         <button class="mt-4 btn-success btn-lg" type="submit">Login</button>
         {% if form.errors %}
             <div class="alert alert-danger mt-3">
@@ -28,10 +38,10 @@
                   {% endfor %}
                 </ul>
             </div>
-          {% endif %}
-          <p class="small mb-5 pt-4"><a class="text-muted" href="{% url 'account_reset_password' %}">¿Olvidó su contraseña?</a></p>
-          <p>No tienes una cuenta? <a href="{% url 'account_signup' %}" class="link-info">Registrate aquí</a></p>
+        {% endif %}
       </form>
+      <p class="small mb-5 pt-4"><a class="text-muted" href="{% url 'account_reset_password' %}">¿Olvidó su contraseña?</a></p>
+      <p>No tienes una cuenta? <a href="{% url 'account_signup' %}" class="link-info">Registrate aquí</a></p>
     </div>
   </div>
 {% endif %}
