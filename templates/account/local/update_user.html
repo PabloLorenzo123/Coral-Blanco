@@ -1,17 +1,12 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Bookstore{% endblock title %}</title>
-        <!-- Boostrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
-        <!-- CSS -->
-        <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    </head>
-    <body class="d-flex align-items-center p-5">
-      <div class="container border rounded p-4 shadow-sm">
+{% extends '_base.html' %}
+{% load static %}
+
+{% block title %}Mi información{% endblock title %}
+
+{% block content %}
+  <div class="p-4">
+    <div class="container border rounded p-4 shadow-sm">
       <!-- When you don't specify an action attribute in your form, the browser submits the form to the current URL. In the case of the login page, the form will be submitted to the URL associated with the LoginView.-->
         <form method="post">
           {% csrf_token %}
@@ -23,13 +18,13 @@
               <!-- que va aqui ?-->
             </div>
           </div>
-
+  
           <div class="row">
             <div class="form-group col-md-6">
               <label for="{{form.name.id_for_label}}">Name *</label>
               <input id="{{form.name.id_for_label}}" name="{{ form.name.name }}" type="{{form.name.field.widget.type}}" class="form-control" value="{{form.name.value}}">
             </div>
-
+  
             <div class="form-group col-md-6">
               <label for="{{form.last_name.id_for_label}}">Surname *</label>
               <input name="{{form.last_name.name}}" type="{{form.last_name.field.widget.type}}" class="form-control" value="{{form.last_name.value}}">
@@ -41,7 +36,7 @@
               <label for="{{form.birthdate.id_for_label}}">Birthdate *</label>
               <input id="{{form.birthdate.id_for_label}}" name="{{form.birthdate.name}}" type="date" class="form-control" value="{{form.birthdate.value}}">
             </div>
-
+  
             <div class="form-group col md-6">
               <label for="{{form.phone_number.id_for_label}}">Telephone</label>
               <input id="{{form.phone_number.id_for_label}}" name="{{form.phone_number.name}}" type="{{form.phone_number.field.widget.type}}" class="form-control" value="{{form.phone_number.value}}">
@@ -53,7 +48,7 @@
               <label for="{{form.address.id_for_label}}">Address * {Street, floor, letter, etc.}</label>
               <input id="{{form.address.id_for_label}}" name="{{form.address.name}}" type="{{form.address.field.widget.type}}" class="form-control" value="{{form.address.value}}">
             </div>
-
+  
             <div class="form-group col md-6">
               <label for="{{form.postcode.id_for_label}}">Postcode *</label>
               <input id="{{form.postcode.id_for_label}}" name="{{form.postcode.name}}" type="{{form.postcode.type}}" class="form-control" value="{{form.postcode.value}}">
@@ -65,7 +60,7 @@
               <label for="{{form.city.id_for_label}}">Ciudad</label>
               <input id="{{form.city.id_for_label}}" name="{{form.city.name}}" type="{{form.city.type}}" class="form-control" value="{{form.city.value}}">
             </div>
-
+  
             <div class="form-group col md-6">
               <label for="{{form.country.id_for_label}}">Country of residence</label>
               <input id="{{form.country.id_for_label}}" name="{{form.country.name}}" type="{{form.country.type}}" class="form-control" value="{{form.country.value}}">
@@ -76,7 +71,7 @@
             <div class="form-group col md-6">
             </div>
           </div>
-
+  
           <div class="row">
             <div class="col md-6 text-left">
               <button type="submit" class="btn btn-success btn-lg">Submit</button>
@@ -96,5 +91,5 @@
         {% endif %}
         </form>
       </div>
-    </body>
-</html>
+  </div>
+{% endblock content %}

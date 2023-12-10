@@ -2,7 +2,7 @@
 
 {% block title %}Hotel{% endblock title %}
 
-{% block content %}
+{% block search_bar %}
 <!-- Room searchbar -->
     <form id="roomSearchForm" class="row bg-light p-2" action="{% url 'search_room' %}" method="get">
         <div class="row">
@@ -42,9 +42,15 @@
                 <button class="btn btn-success" onclick="validateForm(event)">Buscar</button>
             </div>
         </div>
-    </form>     
+        <div class="col input-group">
+            <button class="btn btn-success">Search</button>
+        </div>
+    </div>
+</form>     
 <!-- End of room search bar -->
+{% endblock search_bar %}
 
+{% block content %}
     <div class="p-4">
         <div class="jumbotron">
             <h1 class="display-4">Hotel</h1>
