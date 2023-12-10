@@ -1,0 +1,13 @@
+{% extends '_base.html' %}
+
+{% block title %}Mis reservaciones{% endblock title %}
+
+{% block content %}
+<ul>
+    {% for reservation in reservations %}
+    <li>
+        <a href="{% url 'reservation_detail' reservation.uuid %}">{{reservation.user_format}}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock content %}

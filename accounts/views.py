@@ -4,10 +4,15 @@ from django.urls import reverse_lazy
 from .models import CustomUser
 from django.contrib.auth.mixins import UserPassesTestMixin
 from allauth.account.views import SignupView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 from .forms import CustomUserChangeForm
 # Create your views here.
+
+class PrivateArea(LoginRequiredMixin, generic.TemplateView):
+    template_name = 'account/local/private_area.html'
 
 """Extending allauth signup view to use my form, and redirect to home"""
 class CustomSignupView(SignupView):
@@ -38,7 +43,7 @@ class UpdateUser(UserPassesTestMixin, generic.UpdateView):
         user = self.get_object()
         initial['name'] = user.name
         initial['last_name'] = user.last_name
-        initial['birthdate'] = user.birthdate
+        initial['birthdate'] = str(user.birthdate)
         initial['country'] = user.country
         initial['city'] = user.city
         initial["postcode"] = user.postcode

@@ -1,0 +1,16 @@
+{% extends '_base.html' %}
+
+{% block title %}Area privada{% endblock title %}
+
+{% block content %}
+<p>Desde esta pagina podrás acceder a tu información y gestionarla</p>
+<h1>
+    Hola, {{user.name}}
+</h1>
+<p>
+    Estadias: {{user.stays}}
+</p>
+<a href="{% url 'update_user' user.uuid %}">Mi información</a>
+<a href="{% url 'user_reservations' %}">Reservaciones</a>
+
+{% endblock content %}

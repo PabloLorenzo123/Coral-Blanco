@@ -1,12 +1,12 @@
 {% load i18n %}
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% trans "Reservation Confirmation at CoralBlanco" %}</title>
+    <title>{% trans "Confirmación de Reserva en CoralBlanco" %}</title>
     <style>
          body {
             font-family: Arial, sans-serif;
@@ -109,62 +109,62 @@
     </header>
 
     <div class="container main">
-        <p style="font-weight: bold;">{% trans "Dear" %} {{reservation.guest.name}} {{reservation.guest.last_name}},</p>
-        <p>{% trans "Thank you for booking with us and choosing CoralBlanco for your upcoming stay." %}</p>
-        <p>{% trans "Below, you will find all the details of your reservation." %}</p>
+        <p style="font-weight: bold;">{% trans "Estimado/a" %} {{reservation.guest.name}} {{reservation.guest.last_name}},</p>
+        <p>{% trans "Gracias por reservar con nosotros y elegir CoralBlanco para su próxima estancia." %}</p>
+        <p>{% trans "A continuación, encontrará todos los detalles de su reserva." %}</p>
         <table border="1" cellpadding="10" cellspacing="0">
             <tr>
-                <th>{% trans "Identifier" %}</th>
+                <th>{% trans "Identificador" %}</th>
                 <td>{{reservation.unique_identifier}}</td>
             </tr>
             <tr>
-                <th>{% trans "Check-In Date" %}</th>
-                <td>{{ check_in_weekday }}, {{check_in_day}} {% trans "of" %} {{check_in_month}} {% trans "of" %} {{check_in_year}}</td>
+                <th>{% trans "Fecha de Check-In" %}</th>
+                <td>{{ check_in_weekday }}, {{check_in_day}} {% trans "de" %} {{check_in_month}} {% trans "de" %} {{check_in_year}}</td>
             </tr>
             <tr>
-                <th>{% trans "Check-Out Date" %}</th>
-                <td>{{ check_out_weekday }}, {{check_out_day}} {% trans "of" %} {{check_out_month}} {% trans "of" %} {{check_out_year}}</td>
+                <th>{% trans "Fecha de Check-Out" %}</th>
+                <td>{{ check_out_weekday }}, {{check_out_day}} {% trans "de" %} {{check_out_month}} {% trans "de" %} {{check_out_year}}</td>
             </tr>
             <tr>
-                <th>{% trans "Room Type" %}</th>
-                <td>{{reservation.room_type}}, {{reservation.adults}} {% trans "adults" %}, {{reservation.children}} {% trans "children" %}.</td>
+                <th>{% trans "Tipo de Habitación" %}</th>
+                <td>{{reservation.room_type}}, {{reservation.adults}} {% trans "adultos" %}, {{reservation.children}} {% trans "niños" %}.</td>
             </tr>
             <tr>
-                <th>{% trans "Total Amount" %}</th>
+                <th>{% trans "Monto Total" %}</th>
                 <td><bold>USD {{ reservation.total_price}}</bold></td>
             </tr>
         </table>
-        <h3>{% trans "Customer Information" %}</h3>
+        <h3>{% trans "Información del Cliente" %}</h3>
         <table border="1" cellpadding="10" cellspacing="0">
             <tr>
-                <th>{% trans "Name" %}</th>
+                <th>{% trans "Nombre" %}</th>
                 <td>{{reservation.guest.name}} {{reservation.guest.last_name}}</td>
             </tr>
             <tr>
-                <th>{% trans "Email" %}</th>
+                <th>{% trans "Correo Electrónico" %}</th>
                 <td>{{reservation.guest.email}}</td>
             </tr>
             <tr>
-                <th>{% trans "Postal Code" %}</th>
+                <th>{% trans "Código Postal" %}</th>
                 <td>{{reservation.guest.postal_code}}</td>
             </tr>
             <tr>
-                <th>{% trans "Card Type" %}</th>
+                <th>{% trans "Tipo de Tarjeta" %}</th>
                 <td>{{reservation.card_brand}}</td>
             </tr>
             <tr>
-                <th>{% trans "Last 4 Digits of the Card" %}</th>
+                <th>{% trans "Últimos 4 Dígitos de la Tarjeta" %}</th>
                 <td>{{reservation.card_last4}}</td>
             </tr>
         </table>
 
-        <p>{% trans "Thank you for choosing CoralBlanco!" %}</p>
+        <p>{% trans "¡Gracias por elegir CoralBlanco!" %}</p>
 
-        <p>{% trans "Sincerely," %}<br>{% trans "CoralBlanco" %}</p>
+        <p>{% trans "Atentamente," %}<br>{% trans "CoralBlanco" %}</p>
     </div>
 
     <footer>
-        <p>&copy; 2023 CoralBlanco. {% trans "All rights reserved." %}</p>
+        <p>&copy; 2023 CoralBlanco. {% trans "Todos los derechos reservados." %}</p>
     </footer>
 </body>
 
