@@ -55,3 +55,4 @@ def update_user_reservation_if_neccesary(request, r_adults, r_children, r_check_
 """This function returns the current reservation instance."""
 def return_reservation_object(request, uuid):
     return get_object_or_404(Reservation, user=request.user, completed=False, uuid=uuid)
+

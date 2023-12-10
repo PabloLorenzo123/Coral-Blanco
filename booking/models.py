@@ -7,6 +7,7 @@ from django.core.mail import EmailMessage
 import booking_project.settings as settings
 from django.template.loader import render_to_string
 
+
 # Create your models here.
 
 """Room and Images"""
@@ -81,6 +82,16 @@ class Room(models.Model):
     
     def __str__(self):
         return str(self.number)
+    
+    """This method returns if a certain room is available."""
+    def is_available(self, check_in_date, check_out_date):
+        return self.room_id in Room.objects.filter(
+                type = self.room_type_id,
+            ).exclude(
+                room_id__in = RoomReservations.objects.filter(
+                    Q(check_out_date__gt=check_in_date) & Q(check_in_date__lt=check_out_date))
+                    .values('room_id')
+            )
 
 class Image(models.Model):
     room_type = models.ForeignKey(
@@ -180,9 +191,27 @@ class Reservation(models.Model):
          self.total_price = self.reservation_price + self.taxes
          self.save()
 
+    """stripe currency need to be in cents."""
+    def stripe_amount(self):
+        return int(self.total_price * 100)
+    
     """This creates a unique identifier for the reservation."""
     def create_unique_identifier(self):
         self.unique_identifier = f"{self.guest.country}{self.reservation_confirmation_uuid}-{self.guest.name}"
+    
+    """This method returns a dictionary with all the dates values in human format."""
+    def dates_to_human_format(self):
+        return {
+                'check_in_weekday': translate_day(self.check_in_date.weekday()),
+                'check_in_day': self.check_in_date.day,
+                'check_in_month': translate_month(self.check_in_date.month),
+                'check_in_year': self.check_in_date.year,
+
+                'check_out_weekday': translate_day(self.check_out_date.weekday()),
+                'check_out_day': self.check_out_date.day,
+                'check_out_month': translate_month(self.check_out_date.month),
+                'check_out_year': self.check_out_date.year,
+                }
 
     """Sends the confirmation email, this is the last step in a reservation."""
     def send_confirmation_email(self):
@@ -190,17 +219,7 @@ class Reservation(models.Model):
         self.create_unique_identifier()
         self.save()
         html_content = render_to_string('booking/email/confirm_reservation_email.html', 
-                                        {'reservation': self,
-                                         'check_in_weekday': self.check_in_date.strftime("%A"),
-                                         'check_in_day': self.check_in_date.day,
-                                         'check_in_month': self.check_in_date.strftime("%B"),
-                                         'check_in_year': self.check_in_date.year,
-
-                                         'check_out_weekday': self.check_out_date.strftime("%A"),
-                                         'check_out_day': self.check_out_date.day,
-                                         'check_out_month': self.check_out_date.strftime("%B"),
-                                         'check_out_year': self.check_out_date.year,
-                                        })
+                                        {**self.dates_to_human_format(), **{'reservation': self}})
         subject = f"{self.guest.name} aquí tiene su confirmación de reserva en CoralBlanco"
         # Create an EmailMessage object.
         email = EmailMessage(
@@ -216,6 +235,9 @@ class Reservation(models.Model):
         # Set this reservation as complete.
         self.completed = True
         self.save()
+        # Update users info.
+        self.user.stays += 1
+        self.user.save()
 
     @staticmethod
     def csv_file_name():
@@ -230,7 +252,10 @@ class Reservation(models.Model):
         return ['room', 'adults', 'children', 'total_price', 'check_in_date', 'check_out_date']
     
     def __str__(self):
-        return f"Reservation of {self.user.username}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
+        return f"Reservación de {self.user.name}, {self.user.last_name}-({self.check_in_date}-{self.check_out_date})-Habitación:{self.room_type}-Noches: {self.nights}-Precio: {self.reservation_price}-Taxes: {self.taxes}-Total: {self.total_price}" 
+    
+    def user_format(self):
+        return f"Id={self.unique_identifier}, ({self.check_in_date}-{self.check_out_date})-Habitación:{self.room_type}, Precio total: {self.total_price}" 
 
 # This table will relate to the user's reservation, it contains the guest info.
 class Guest(models.Model):
@@ -279,3 +304,44 @@ class RoomReservations(models.Model):
     # Can acces the reservation with RoomReservations.reservation.
     check_in_date = models.DateField(null=True)
     check_out_date = models.DateField(null=True) # remember to add null false.
+
+
+
+
+
+
+
+
+
+
+
+""" Functions """
+"""To translate days and months to spanish"""
+def translate_day(day):
+    WEEKDAY_NAMES = {
+        0: 'Lunes',
+        1: 'Martes',
+        2: 'Miércoles',
+        3: 'Jueves',
+        4: 'Viernes',
+        5: 'Sábado',
+        6: 'Domingo',
+    }
+    return WEEKDAY_NAMES[day]
+
+def translate_month(month):
+    MONTH_NAMES = {
+        1: 'Enero',
+        2: 'Febrero',
+        3: 'Marzo',
+        4: 'Abril',
+        5: 'Mayo',
+        6: 'Junio',
+        7: 'Julio',
+        8: 'Agosto',
+        9: 'Septiembre',
+        10: 'Octubre',
+        11: 'Noviembre',
+        12: 'Diciembre',
+    }
+    return MONTH_NAMES[month]

@@ -1,3 +1,5 @@
+from typing import Any
+from django.db.models.query import QuerySet
 import stripe
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
@@ -8,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import RoomType, Reservation, Guest, RoomReservations
 from .forms import GuestForm
-from .views_helper import RoomSearch, update_user_reservation_if_neccesary, return_reservation_object
+from .helper import RoomSearch, update_user_reservation_if_neccesary, return_reservation_object
 import booking_project.settings as settings
 
 # Create your views here.
@@ -99,7 +101,11 @@ class CreateGuest(LoginRequiredMixin, generic.CreateView):
     model = Guest
     form_class = GuestForm
     template_name = 'booking/guest_details.html'  # Create an HTML template for the form
-    context_object_name = 'form'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_reservation'] = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
+        return context
 
     def get_success_url(self):
         user_reservation = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
@@ -150,6 +156,11 @@ class UpdateGuest(LoginRequiredMixin, generic.UpdateView):
     form_class = GuestForm
     template_name = 'booking/update_guest_details.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_reservation'] = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
+        return context
+    
     def get_success_url(self):
         user_reservation = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         return reverse('confirm_reservation', kwargs={'uuid': user_reservation.uuid})
@@ -158,6 +169,16 @@ class UpdateGuest(LoginRequiredMixin, generic.UpdateView):
         user_reservation = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         return Guest.objects.get(user_reservation=user_reservation)
     
+    def get_initial(self):
+        # This way the form gets initial values that could haven provided before in the user account, in user_info.
+        form_context = super().get_initial()
+        form_context['name'] = self.request.user.name
+        form_context['last_name'] = self.request.user.last_name
+        form_context['email'] = self.request.user.email
+        form_context['country'] = self.request.user.country
+        form_context['postal_code'] = self.request.user.postcode
+        return form_context
+
     def dispatch(self, request, *args, **kwargs):
         # Check if the user has a reservation, and if the reservation of this template is his.
         # This is the uuid at the end of the url.
@@ -174,7 +195,7 @@ class ConfirmReservation(LoginRequiredMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['stripe_key'] = settings.STRIPE_TEST_PUBLISHABLE_KEY
-        context['stripe_price'] = self.get_object().total_price * 100 # Because stripe price is in cents.
+        context['stripe_price'] = self.get_object().stripe_amount() # Because stripe price is in cents.
         return context
     
     def get_object(self):
@@ -224,7 +245,7 @@ def payment_confirm_reservation_done(request, uuid):
     try:
         if request.method == 'POST':
             charge = stripe.Charge.create(
-            amount=user_reservation.total_price,
+            amount= user_reservation.stripe_amount(),
             currency='usd',
             description='Reservar habitación' + user_reservation.room_type.type,
             source=request.POST['stripeToken'],
@@ -233,7 +254,8 @@ def payment_confirm_reservation_done(request, uuid):
         user_reservation.payment_token = charge.id
         user_reservation.card_last4 = charge.source['last4']
         user_reservation.card_brand = charge.source['brand']
-    except:
+    except stripe.error.StripeError as e:
+        print(f"Stripe error: {e.error.message}")
         return HttpResponse('No se pudo procesar el pago, intentelo denuevo.')
     
     """Room asignment"""
@@ -251,13 +273,24 @@ def payment_confirm_reservation_done(request, uuid):
     )
     # Send confirmation email.
     user_reservation.send_confirmation_email()
+
  
     return render(request, 'booking/confirm_reservation_done.html', context)
+
+
+"""User related views"""
+class MyReservations(LoginRequiredMixin, generic.ListView):
+    model = Reservation
+    template_name = 'account/local/my_reservations.html'
+    context_object_name = 'reservations'
+
+    def get_queryset(self):
+        return Reservation.objects.filter(user=self.request.user)
 
 class ReservationDetail(LoginRequiredMixin, generic.DetailView):
     model = Reservation
     context_object_name = 'user_reservation'
-    template_name = 'confirmed_reservation_detail.html'
+    template_name = 'booking/confirmed_reservation_detail.html'
 
     def get_object(self):
         return get_object_or_404(Reservation, user=self.request.user, uuid=self.kwargs['uuid'], completed=True)

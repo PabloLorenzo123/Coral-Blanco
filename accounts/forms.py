@@ -5,10 +5,13 @@ from allauth.account.forms import SignupForm
 
 # THIS FORM IS USED IN MY INFORMATION.HTML
 class CustomUserChangeForm(UserChangeForm):
-    birthdate = forms.DateField( widget=forms.DateInput(attrs={'type': 'date'}), required=False)
-    name = forms.CharField(max_length=30, label='Name', required=False)
-    last_name = forms.CharField(max_length=30, label='Last Name', required=False)
-    country = forms.CharField(max_length=30, label='Country', required=False)
+    birthdate = forms.DateField( widget=forms.DateInput(attrs={'type': 'date'}), required=True)
+    name = forms.CharField(max_length=30, label='Name', required=True)
+    last_name = forms.CharField(max_length=30, label='Last Name', required=True)
+    country = forms.CharField(max_length=30, label='Country', required=True)
+    phone_number = forms.CharField(max_length=15, label='Phone number', required=False)
+    city = forms.CharField(max_length=50, label='City', required=False)
+    postcode = forms.CharField(max_length=10, label='post_code', required=False)
 
     class Meta:
         model = get_user_model()

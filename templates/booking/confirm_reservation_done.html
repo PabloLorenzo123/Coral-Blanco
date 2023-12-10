@@ -3,17 +3,9 @@
 {% block title %}Tu estadia{% endblock title %}
 
 {% block content %}
-<p>Reservación exitosa: se ha enviado a tu correo todos los detalles de la reservación</p>
+<p>Reservación exitosa: se ha enviado a tu correo {{user_reservation.guest.email}} todos los detalles de la reservación</p>
 <p>Identificador unico: {{user_reservation.unique_identifier}}</p>
-<h1>Tu estadia</h1>
-<p>Habitacion: {{user_reservation.room_type}}</p>
-<p>Check in: {{user_reservation.check_in_date}} a las 13:00, Check out: {{user_reservation.check_out_date}}</p>
-<p>Noches: {{user_reservation.nights}}</p>
-<p>Precio: {{user_reservation.reservation_price}}</p>
-<p>Impuestos: {{user_reservation.taxes}}</p>
-<p>Precio total: {{user_reservation.total_price}}</p>
-<br>
-
+{% include 'booking/_stay.html' %}
 
 
 {% endblock content %}

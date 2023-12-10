@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import RoomDetailView, search_room, reservate_now, payment_confirm_reservation_done, CreateGuest, UpdateGuest, ConfirmReservation, RoomsListView, ReservationDetail
+from .views import RoomDetailView, search_room, reservate_now, payment_confirm_reservation_done, CreateGuest, UpdateGuest, ConfirmReservation, RoomsListView, ReservationDetail, MyReservations
 
 urlpatterns = [
     path('room_details/<uuid:uuid>', RoomDetailView.as_view(), name='room_detail'),
@@ -12,5 +12,7 @@ urlpatterns = [
 
     path('confirm_reservation/<uuid:uuid>/', ConfirmReservation.as_view(), name='confirm_reservation'),      # The uuid is the cart indentifier.         # The uuid is the cart indentifier.
     path('confirm_reservation_done/<uuid:uuid>/', payment_confirm_reservation_done, name='confirm_reservation_done'),# The uuid is the cart indentifier.
+    
+    path('mis_reservaciones/', MyReservations.as_view(), name='user_reservations'),
     path('reservation_detail/<uuid:uuid>/', ReservationDetail.as_view(), name='reservation_detail'),
 ]

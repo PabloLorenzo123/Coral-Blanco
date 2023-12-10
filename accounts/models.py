@@ -1,5 +1,6 @@
 from django.db import models
 import uuid
+from django.urls import reverse
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -24,8 +25,8 @@ class CustomUser(AbstractUser):
     name = models.CharField(max_length=15)
     last_name = models.CharField(max_length=30)
     birthdate = models.DateField(default=timezone.now)
-    address = models.CharField(max_length=100, default="none")
-    city = models.CharField(max_length=50, default="none")
+    address = models.CharField(max_length=100, default="none", null=True)
+    city = models.CharField(max_length=50, default="none", null=True)
 
     stays = models.IntegerField(default=0)
     
@@ -53,3 +54,5 @@ class CustomUser(AbstractUser):
         null=True,
     )
 
+    def get_absolute_url(self):
+        return reverse('user_dashboard')

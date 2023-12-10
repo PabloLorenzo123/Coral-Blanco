@@ -42,11 +42,7 @@
                 <button class="btn btn-success" onclick="validateForm(event)">Buscar</button>
             </div>
         </div>
-        <div class="col input-group">
-            <button class="btn btn-success">Search</button>
-        </div>
-    </div>
-</form>     
+    </form>     
 <!-- End of room search bar -->
 {% endblock search_bar %}
 
@@ -63,9 +59,8 @@
             </p>
     </div>
     <script>
-        console.log("klk")
         function validateForm(event) {
-            event.preventDefault(event)
+            event.preventDefault(event);
     
             var form = document.getElementById('roomSearchForm');
             var checkInDate = new Date(form.elements['check_in_date'].value);

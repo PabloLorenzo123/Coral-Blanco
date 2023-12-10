@@ -1,22 +1,62 @@
 {% extends '_base.html' %}
+
 {% block title %}Confirmar reservación{% endblock title %}
 
 {% block content %}
-<h1>Tu estadia</h1>
-{{user_reservation}}
-<h1>Detalles del huésped</h1>
-{{user_reservation.guest}}
-<p>Para confirmar la reservación, pague</p>
-<form action="{% url 'confirm_reservation_done' user_reservation.uuid %}" method="post">
-    {% csrf_token %}
-    <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-    data-key="{{ stripe_key }}"
-    data-description="{{user_reservation}}"
-    data-amount="{{ stripe_price }}"
-    data-label = "Paga con tarjeta"
-    data-locale="auto">
-    </script>
-</form>
-    
+<div class="p-4 bg-light h-100">
+    <!-- Contact info column -->
+    <div class="col-md-6">
+        <div class="container bg-white border rounded shadow-sm">
+            <!-- Header Row -->
+            <div class="row">
+                <h3 class="fw-bold">Confirmar reservación</h3>
+            </div>
+            <!-- Selected room -->
+            <div class="row">
+                <div class="container">
+                    <!-- Room image -->
+                    <div class="col-md-6">
+                        <img src="{{user_reservation.room_type.images.all.0.url}}" class="rounded">
+                    </div>
+                    <!-- Room Details-->
+                    <div class="col-md-6">
+                        <p class="lead">Habitación {{user_reservation.room_type}}</p>
+                        <p class="fw-bold">Pague ahora el total</p>
+                        <p>
+                            Le cobraremos USD {{user_reservation.total_price}} tras confirmar la reserva.
+                            Debe presentar la tarjeta utilizada para el prepago de la reserva y acreditar la titularidad durante el check-in.
+                        </p>
+                        <p>Al pagar los detalles de la reservación serán enviados al correo {{user_reservation.guest.email}}</p>
+                        <p class="fw-bold">No reembolsable</p>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dividing line -->
+            <hr>
+            
+            <!-- Pay now button -->
+            <div class="row">
+                <form action="{% url 'confirm_reservation_done' user_reservation.uuid %}" method="post">
+                    {% csrf_token %}
+                    <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                    data-key="{{ stripe_key }}"
+                    data-description="{{user_reservation}}"
+                    data-amount="{{ stripe_price }}"
+                    data-label = "Paga con tarjeta"
+                    data-locale="auto">
+                    </script>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reservation summary column-->
+    <div class="col-md-6">
+        {% include 'booking/_stay.html' %}
+    </div>
+</div>
+
 
 {% endblock content %}

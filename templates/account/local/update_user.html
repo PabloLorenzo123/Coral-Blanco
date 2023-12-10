@@ -21,49 +21,60 @@
   
           <div class="row">
             <div class="form-group col-md-6">
-              <label for="{{form.name.id_for_label}}">Name *</label>
-              <input id="{{form.name.id_for_label}}" name="{{ form.name.name }}" type="{{form.name.field.widget.type}}" class="form-control" value="{{form.name.value}}">
+              <label for="{{form.name.id_for_label}}">Nombre</label>
+              <input id="{{form.name.id_for_label}}" name="{{ form.name.name }}" 
+              type="{{form.name.field.widget.type}}" class="form-control" value="{{form.name.value}}">
             </div>
   
             <div class="form-group col-md-6">
-              <label for="{{form.last_name.id_for_label}}">Surname *</label>
-              <input name="{{form.last_name.name}}" type="{{form.last_name.field.widget.type}}" class="form-control" value="{{form.last_name.value}}">
+              <label for="{{form.last_name.id_for_label}}">Apellidos</label>
+              <input name="{{form.last_name.name}}" type="{{form.last_name.field.widget.type}}" 
+              class="form-control" value="{{form.last_name.value}}">
             </div>
           </div>
   
           <div class="row">
             <div class="form-group col md-6">
-              <label for="{{form.birthdate.id_for_label}}">Birthdate *</label>
-              <input id="{{form.birthdate.id_for_label}}" name="{{form.birthdate.name}}" type="date" class="form-control" value="{{form.birthdate.value}}">
+              <label for="{{form.birthdate.id_for_label}}">Fecha de nacimiento</label>
+              <input id="{{form.birthdate.id_for_label}}" name="{{form.birthdate.name}}"
+              type="date" class="form-control" value="{{form.birthdate.value}}">
             </div>
   
             <div class="form-group col md-6">
-              <label for="{{form.phone_number.id_for_label}}">Telephone</label>
-              <input id="{{form.phone_number.id_for_label}}" name="{{form.phone_number.name}}" type="{{form.phone_number.field.widget.type}}" class="form-control" value="{{form.phone_number.value}}">
+              <label for="{{form.phone_number.id_for_label}}">Teléfono</label>
+              <input id="{{form.phone_number.id_for_label}}" name="{{form.phone_number.name}}"
+              type="{{form.phone_number.field.widget.type}}" class="form-control" maxlength="10" {% if user.phone_number != None %}
+              value="{{form.phone_number.value}}" {% endif %}>
             </div>
           </div>
   
           <div class="row">
             <div class="form-group col md-6">
-              <label for="{{form.address.id_for_label}}">Address * {Street, floor, letter, etc.}</label>
-              <input id="{{form.address.id_for_label}}" name="{{form.address.name}}" type="{{form.address.field.widget.type}}" class="form-control" value="{{form.address.value}}">
+              <label for="{{form.address.id_for_label}}">Dirección</label>
+              <input id="{{form.address.id_for_label}}" name="{{form.address.name}}"
+              type="{{form.address.field.widget.type}}" class="form-control" value="{{form.address.value}}">
             </div>
   
             <div class="form-group col md-6">
-              <label for="{{form.postcode.id_for_label}}">Postcode *</label>
-              <input id="{{form.postcode.id_for_label}}" name="{{form.postcode.name}}" type="{{form.postcode.type}}" class="form-control" value="{{form.postcode.value}}">
+              <label for="{{form.postcode.id_for_label}}">Codigo postal</label>
+              <input id="{{form.postcode.id_for_label}}" name="{{form.postcode.name}}" 
+              type="number" class="form-control" value="{{form.postcode.value}}">
             </div>
           </div>
   
           <div class="row">
             <div class="form-group col md-6">
               <label for="{{form.city.id_for_label}}">Ciudad</label>
-              <input id="{{form.city.id_for_label}}" name="{{form.city.name}}" type="{{form.city.type}}" class="form-control" value="{{form.city.value}}">
+              <input id="{{form.city.id_for_label}}" name="{{form.city.name}}" 
+              type="{{form.city.type}}" class="form-control" value="{{form.city.value}}">
             </div>
   
             <div class="form-group col md-6">
-              <label for="{{form.country.id_for_label}}">Country of residence</label>
-              <input id="{{form.country.id_for_label}}" name="{{form.country.name}}" type="{{form.country.type}}" class="form-control" value="{{form.country.value}}">
+              <label for="{{form.country.id_for_label}}">País de residencia</label>
+              <select id="{{form.country.id_for_label}}" name="{{form.country.name}}" 
+              type="{{form.country.type}}" class="form-control" value="{{form.country.value}}">
+              {% include '_countries.html' %}
+              </select>
             </div>
           </div>
   
@@ -74,12 +85,12 @@
   
           <div class="row">
             <div class="col md-6 text-left">
-              <button type="submit" class="btn btn-success btn-lg">Submit</button>
+              <button type="submit" class="btn btn-success btn-lg">Actualizar</button>
             </div>
           </div>
           {% if form.errors %}
           <div class="alert alert-danger mt-3">
-              <strong>Error:</strong> Please correct the following issues and try again.
+              <strong>Error:</strong> Por favor corrige los siguientes errores e intentelo denuevo.
               <ul>
                   {% for field, error_list in form.errors.items %}
                       {% for error in error_list %}
