@@ -3,6 +3,12 @@
 {% block title %}Mis reservaciones{% endblock title %}
 
 {% block content %}
+<div class="bg-light">
+    <div class="row w-50 border p-4">
+        <p>Reservaciones: {{ user.stays }}</p>
+        <p>Cancelaciones: 10</p>
+    </div>
+</div>
 <div class="p-4 bg-light h-100">
     <!-- Reservation wrap-->
     <div class="d-flex flex-wrap">

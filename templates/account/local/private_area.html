@@ -4,15 +4,23 @@
 
 {% block content %}
 <div class="p-4 bg-light h-100">
-    <div class="container bg-white p-4 border shadow-sm w-50">
-        <div>
-            <h1>Hola, {{ user.name }}!</h1>
-            <p>
-                Estadías: {{ user.stays }}
-            </p>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="container bg-white p-4 border shadow-sm w-100 h-100">
+                <div>
+                    <h1>Hola, {{ user.name }}!</h1>
+                    <p>
+                        Estadías: {{ user.stays }}
+                    </p>
+                </div>
+                <a class="btn btn-success btn-lg mt-4" href="{% url 'update_user' user.uuid %}">Mi información</a>
+                <a class="btn btn-success btn-lg mt-4" href="{% url 'user_reservations' %}">Reservaciones</a>
+            </div>
         </div>
-        <a class="btn btn-success btn-lg mt-4" href="{% url 'update_user' user.uuid %}">Mi información</a>
-        <a class="btn btn-success btn-lg mt-4" href="{% url 'user_reservations' %}">Reservaciones</a>
+        <div class="col-md-8">
+
+        </div>
     </div>
+    
 </div>
 {% endblock content %}
