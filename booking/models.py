@@ -48,9 +48,8 @@ class RoomType(models.Model):
     def csv_headers():
         return ['Type', 'Short Description', 'Description', 'Max Adults', 'Max Children', 'Price']
     
-    @staticmethod
-    def csv_attributes():
-        return ['', 'short_description','description', 'max_adults', 'max_children']
+    def to_csv(self):
+        return [self.type, self.short_description, self.description, self.max_adults, self.max_children]
     
     def __str__(self):
         return self.type
@@ -72,11 +71,10 @@ class Room(models.Model):
     
     @staticmethod
     def csv_headers():
-        return ['Number', 'Building', 'Avaliability', 'Type']
+        return ['Number', 'Type']
     
-    @staticmethod
-    def csv_attributes():
-        return ['number', 'building', 'availability', 'room_type']
+    def to_csv(self):
+        return [self.number, self.type]
     
     def __str__(self):
         return str(self.number)
@@ -206,10 +204,10 @@ class Reservation(models.Model):
     def csv_headers():
         return ['Room', 'Adults', 'Children', 'Total Price', 'Check In', 'Check Out']
     
-    @staticmethod
-    def csv_attributes():
-        return ['room', 'adults', 'children', 'total_price', 'check_in_date', 'check_out_date']
+    def to_csv(self):
+        return [self.room, self.adults, self.children, self.total_price, self.check_in_date, self.check_out_date]
     
+
     def __str__(self):
         return f"Reservation of {self.user.username}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
 
@@ -241,9 +239,8 @@ class Guest(models.Model):
     def csv_headers():
         return ['Name', 'Last Name', 'Email', 'Country', 'Postal Code']
     
-    @staticmethod
-    def csv_attributes():
-        return ['name', 'last_name', 'email', 'country', 'postal_code']
+    def to_csv(self):
+        return [self.name, self.last_name, self.email, self.country, self.postal_code]
     
     def __str__(self):
         return f'{self.name} {self.last_name}'
