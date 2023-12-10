@@ -2,10 +2,19 @@
 
 {% block title %}Hotel{% endblock title %}
 
+{% block extra_css %}
+    <style>
+        .p-text {
+            text-align: justify;
+            font-size: 14px;
+        }
+    </style>
+{% endblock extra_css %}
+
 {% block search_bar %}
 <!-- Room searchbar -->
-    <form id="roomSearchForm" class="row bg-light p-2" action="{% url 'search_room' %}" method="get">
-        <div class="row">
+    <form id="roomSearchForm" class="bg-light p-2" action="{% url 'search_room' %}" method="GET">
+        <div class="row" style="width: 90%; margin-left: auto; margin-right: auto;">
             <!--Dates-->
             <div class="col input-group">
                 <input name="check_in_date" type="date" class="form-control" required min="{{ today|date:'Y-m-d' }}" required>
@@ -13,11 +22,11 @@
             </div>
             <div class="col">
                 <div class="row">
-                    <!-- adults -->
+                    <!-- Adults -->
                     <div class="col input-group">
                         <i class="fas fa-user-friends input-group-text"></i>
                         <select name="adults" class="form-select" required>
-                            <option selected>Open this select menu</option>
+                            <option disabled selected>Adultos</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -29,17 +38,19 @@
                     <div class="col input-group">
                         <i class="fas fa-user-friends input-group-text"></i>
                         <select name="children" class="form-select" required>
-                            <option selected>Open this select menu</option>
+                            <option disable selected>Niños</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
                             <option value="4">4</option>
                         </select>
                     </div>
+
+                    <!-- Search Button -->
+                    <div class="col input-group">
+                        <button class="btn btn-success" onclick="validateForm(event)">Buscar</button>
+                    </div>
                 </div>
-            </div>
-            <div class="col input-group">
-                <button class="btn btn-success" onclick="validateForm(event)">Buscar</button>
             </div>
         </div>
     </form>     
@@ -47,16 +58,289 @@
 {% endblock search_bar %}
 
 {% block content %}
-    <div class="p-4">
-        <div class="jumbotron">
-            <h1 class="display-4">Hotel</h1>
-            <p class="lead">El <b>Hotel</b> es uno de los mejores hoteles en Punta Cana, ideal para disfrutar del sol, de la brisa del Caribe y de la belleza de un mar con arrecifes de coral y aguas cristalinas.</p>
-            <hr class="my-4">
-            <p>Ubicado a lo largo de una de las 10 mejores playas por National Geographic y Tripadvisor, este hotel 5 estrellas todo incluido en Punta Cana ofrece unas vacaciones de ensueño en su B-room con vistas, la mejor tecnología y detalles de lujo.
-            </p>
-            <p class="lead">
-                <a class="btn btn-primary btn-lg" href="{% url 'rooms' %}" role="button">Habitaciones</a>
-            </p>
+    <div>
+        <!-- Header -->
+        <!-- Image carousel -->
+        <div id="carousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_VIEW_43-4?fmt=webp-alpha&qlt=75&wid=1900&hei=950&fit=crop,1&defaultImage=default-dm&ts=1702220404760" class="d-block w-100" style="object-fit: cover; height: 350px;" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_ROOM_130-1?fmt=webp-alpha&qlt=75&wid=1900&hei=950&fit=crop,1&defaultImage=default-dm&ts=1702220404758" class="d-block w-100" style="object-fit: cover; height: 350px;" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_100?fmt=webp-alpha&qlt=75&wid=1900&hei=950&fit=crop,1&defaultImage=default-dm&ts=1702220404792" class="d-block w-100" style="object-fit: cover; height: 350px;" alt="...">
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+
+        <!-- Nav -->
+        <ul class="nav nav-tabs m-4 sticky-top bg-white">
+            <li class="nav-item">
+                <a class="nav-link" style="color: #555;" href="#hotel">Hotel</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" style="color: #555;" href="{% url 'rooms' %}">Habitaciones</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" style="color: #555;" href="#instalaciones">Instalaciones</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" style="color: #555;" href="#redes">Redes Sociales</a>
+            </li>
+        </ul>
+
+        <!-- Body -->
+        <div class="p-4">
+
+            <!-- Hotel -->
+            <div class="row p-4" id="hotel">
+                <!-- Text about the hotel -->
+                <div class="col-md-6">
+                    <!-- First section-->
+                    <section>
+                        <p class="fst-normal p-text">
+                            El hotel Barceló Bávaro Palace 5 estrellas es uno de los mejores hoteles en Punta Cana, ideal para disfrutar del sol, de la brisa del Caribe y de la belleza de un mar con arrecifes de coral y aguas cristalinas.
+                        </p>
+                        <p class="fst-normal p-text">
+                            Ubicado a lo largo de una de las 10 mejores playas por National Geographic y Tripadvisor, este hotel 5 estrellas todo incluido en Punta Cana ofrece unas vacaciones de ensueño en su B-room con vistas, la mejor tecnología y detalles de lujo.
+                        </p>
+                    </section>
+                    <!-- Second section -->
+                    <section>
+                        <h6 class="fw-bold">
+                            Barceló Bávaro Palace ofrece un entorno paradisíaco para relajar y practicar un sinfín de actividades.
+                        </h6>
+                        <p class="fst-normal p-text">
+                            La gran oferta de uno de los mejores resorts todo incluido de Punta Cana,
+                            República Dominicana hace que el huésped no solo disfrute, sino que coleccione experiencias únicas,
+                            como degustar sabores dominicanos o especialidades gastronómicas internacionales en sus 11 restaurantes.
+                        </p>
+                        <p class="fst-normal p-text">
+                            También se puede aprovechar para practicar deportes acuáticos como buceo, esnórquel, kayak o windsurf. 
+                            Hay multitud de instalaciones para deportistas, un exclusivo spa para los que busquen relax; 
+                            además de un casino 24h, 2 discotecas, campo de golf The Lakes, Escape Room, Shopping Mall, campo de fútbol profesional, 
+                            campo de béisbol semi profesional y espectáculos nocturnos para los más activos durante la noche.
+                        </p>
+                        <p class="fst-normal p-text">
+                            Despertar en un entorno paradisíaco y optar entre el más placentero relax o la mejor variedad de actividades es todo en lo que un huésped
+                            del Barceló Bávaro Palace tiene que pensar. Un hotel todo incluido que forma parte del magnífico Barceló Bávaro Grand Resort, 
+                            conformado por el Barceló Bávaro Beach - Solo Adultos y el Barceló Bávaro Palace.
+                        </p>
+                    </section>
+                </div>
+
+                <!-- Location on the map -->
+                <div class="col-md-6 p-4">
+                    <div class="card shadow-sm">
+                        <div style="height: 25rem;">
+                            <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3778.431756809426!2d-68.47478962480305!3d18.73424198240127!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8ea8ea1e2994568b%3A0x3454aa51efbc305!2sOccidental%20Caribe%20-%20All%20Inclusive!5e0!3m2!1ses-419!2sdo!4v1702224506716!5m2!1ses-419!2sdo" 
+                            width="100%" height="100%" style="object-fit: cover" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">Coral Blanco</h5>
+                            <p class="card-text">Locación.</p>
+                            <a href="#" class="btn btn-primary">Marcar ruta</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instalaciones -->
+            <div class="bg-light p-4" id="instalaciones">
+
+                <!-- Header -->
+                <div class="row">
+                    <h3 class="fw-bold">
+                        Instalaciones y servicios en el Coral Blanco
+                    </h3>
+                    <p class="fst-normal p-text">
+                        Disfruta de unas perfectas vacaciones con todo incluido 
+                        en Punta Cana con los mejores servicios e instalaciones del Barceló Bávaro Palace: 
+                        restaurantes y bares para todos los gustos, piscinas, entretenimiento para toda la familia,
+                        actividades deportivas y servicios Premium para garantizar a los huéspedes más exigentes una 
+                        estancia de lujo.
+                    </p>
+                </div>
+    
+                <!-- Gastronomia -->
+                <div> 
+                    <div class="row mt-4 p-4">
+                        <!-- Restaurant photo gallery -->
+                        <div class="col-md-6">
+                            <div id="carouselRestaurant" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_GAST_53-2?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220408638" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_GAST_66-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220408640" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_GAST_64?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220408635" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_GAST_92-2?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220409133" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_GAST_89-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220409153" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_GAST_63-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220408631" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselRestaurant" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselRestaurant" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>            
+                        </div>
+    
+                        <!-- Gastronomia description -->
+                        <div class="col-md-6 p-4">
+                            <h5 class="fw-bold">Gastronomía</h5>
+                            <p class="fst-normal p-text">
+                                Los restaurantes y bares del hotel incluyen una variada oferta gastronómica de platos locales
+                                e internacionales pensados para satisfacer el paladar de todos los huéspedes.
+                            </p>
+                            <p class="fst-normal p-text">
+                                Cada uno de los restaurantes de <b>Coral Blanco</b> ofrece una experiencia gourmet inconfundible.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Piscinas y Exteriores -->
+                <div> 
+                    <div class="row mt-4 p-4">
+                        
+                        <!-- Piscinas description -->
+                        <div class="col-md-6 p-4">
+                            <h5 class="fw-bold">Piscinas y Exteriores</h5>
+                            <p class="fst-normal p-text">
+                                El hotel <b>Coral Blanco</b> cuenta con una gran piscina solo para adultos
+                                donde refrescar y disfrutar de la tranquilidad, una piscina semi-olímpica y
+                                una infantil para la diversión de lo más pequeños.
+                            </p>
+                        </div>
+    
+                        <!-- Piscinas photo gallery -->
+                        <div class="col-md-6">
+                            <div id="carouselPools" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_43-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220408542" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_66?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220408536" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_65-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220408604" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_41?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220408614" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_41?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220408614" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_47-2?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702220408522" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselPools" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselPools" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>            
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Entretenimiento -->
+                <div> 
+                    <div class="row mt-4 p-4">
+                        <!-- Entretenimiento photo gallery -->
+                        <div class="col-md-6">
+                            <div id="carouselEntertaiment" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner">
+                                    <div class="carousel-item active">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_LIFE_138-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702228868738" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_79-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702228868804" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_80-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702228868823" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_82-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702228868834" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_POOL_88-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702228868837" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                    <div class="carousel-item">
+                                        <img src="https://s7g10.scene7.com/is/image/barcelo/BBAVP_LIFE_36-1?fmt=webp-alpha&qlt=75&wid=1000&hei=500&fit=crop,1&defaultImage=default-dm&ts=1702228868886" class="d-block w-100 rounded" style="object-fit: cover; height: 350px;" alt="...">
+                                    </div>
+                                </div>
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselEntertaiment" data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Previous</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselEntertaiment" data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Next</span>
+                                </button>
+                            </div>            
+                        </div>
+    
+                        <!-- Gastronomia description -->
+                        <div class="col-md-6 p-4">
+                            <h5 class="fw-bold">Entretenimiento</h5>
+                            <p class="fst-normal p-text">
+                                En el <b>hotel Coral Blanco</b> todo está pensando para que pequeños y mayores
+                                disfruten de unas perfectas vacaciones en Punta Cana. 
+                                Magníficas instalaciones infantiles para niños y adolescentes, 
+                                una amplia oferta deportiva y divertidas actividades harán cada estancia un momento único.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top p-4" id="redes">
+            <div class="col-md-4 d-flex align-items-center">
+              <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
+                Coral Blanco
+              </a>
+              <span class="text-muted">© 2021 Company, Inc</span>
+            </div>
+        
+            <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+              <li class="ms-3"><a class="text-muted" href="#"><i class="fa-brands fa-twitter"></i></li>
+              <li class="ms-3"><a class="text-muted" href="#"><i class="fa-brands fa-instagram"></i></li>
+              <li class="ms-3"><a class="text-muted" href="#"><i class="fa-brands fa-facebook"></i></li>
+            </ul>
+        </footer>
     </div>
     <script>
         function validateForm(event) {

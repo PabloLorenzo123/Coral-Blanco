@@ -29,6 +29,7 @@ class RoomType(models.Model):
     max_children = models.IntegerField(blank=True, null=True)
     
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    
 
     def get_available_rooms(self, r_check_in_date, r_check_out_date):
         return Room.objects.filter(
@@ -67,8 +68,17 @@ class Room(models.Model):
         related_name="room_type",
     )
 
+    @staticmethod
+    def csv_file_name():
+        return 'Rooms'
+    
+    @staticmethod
+    def csv_headers():
+        return ['Number', 'Type', 'Avaibility']
+    
     def to_csv(self):
-        return [self.number, self.type]
+        return [self.number, self.type, ]
+    
     
     """This method returns if a certain room is available."""
     def is_available(self, check_in_date, check_out_date):
@@ -82,14 +92,6 @@ class Room(models.Model):
     
     def __str__(self):
         return str(self.number)
-
-    @staticmethod
-    def csv_file_name():
-        return 'Rooms'
-    
-    @staticmethod
-    def csv_headers():
-        return ['Number', 'Type']
 
 class Image(models.Model):
     room_type = models.ForeignKey(
@@ -115,6 +117,7 @@ class Feature(models.Model):
     
     def __str__(self):
         return self.feature
+
 
 class RoomFeature(models.Model):
     room_type = models.ForeignKey(
@@ -166,6 +169,8 @@ class Reservation(models.Model):
     card_payment_token = models.CharField(max_length=100, null=True)
     card_last4 = models.CharField(max_length=4, null=True)
     card_brand = models.CharField(max_length=10, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)  # To keep track of when a reservation has been registered
 
     room_type = models.ForeignKey(
         RoomType,
@@ -238,7 +243,7 @@ class Reservation(models.Model):
         self.user.save()
     
     def user_format(self):
-        return f"Id={self.unique_identifier}, ({self.check_in_date}-{self.check_out_date})-Habitación:{self.room_type}, Precio total: {self.total_price}" 
+        return f"Reservado en {self.created_at.year}-{self.created_at.month}-{self.created_at.day}, Habitación:{self.room_type}, ({self.check_in_date}-{self.check_out_date}) Precio total: {self.total_price}" 
     
     def to_csv(self):
         return [self.room, self.adults, self.children, self.total_price, self.check_in_date, self.check_out_date]
@@ -266,9 +271,11 @@ class Guest(models.Model):
 
     name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
+
     email = models.EmailField()
     country = models.CharField(max_length=2, default='US')
-    postal_code = models.CharField(max_length=20, null=True) 
+    postal_code = models.CharField(max_length=20, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)  # To keep track of when a guest has been registered
     
     def to_csv(self):
         return [self.name, self.last_name, self.email, self.country, self.postal_code]

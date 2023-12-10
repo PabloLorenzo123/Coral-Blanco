@@ -281,11 +281,11 @@ def payment_confirm_reservation_done(request, uuid):
 """User related views"""
 class MyReservations(LoginRequiredMixin, generic.ListView):
     model = Reservation
-    template_name = 'account/local/my_reservations.html'
+    template_name = 'booking/my_reservations.html'
     context_object_name = 'reservations'
 
     def get_queryset(self):
-        return Reservation.objects.filter(user=self.request.user)
+        return Reservation.objects.filter(user=self.request.user).order_by('-created_at')
 
 class ReservationDetail(LoginRequiredMixin, generic.DetailView):
     model = Reservation

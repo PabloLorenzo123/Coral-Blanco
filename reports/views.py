@@ -34,14 +34,27 @@ def report(request, start_date, end_date):
     writer = csv.writer(response)
 
     # Get all instances of the class
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    if obj == Reservation:
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        if (start_date and end_date):
+            rs = obj.objects.filter(
+                Q(check_out_date__gte=start_date) & Q(check_in_date__lte=end_date)
+            )
+        else:
+            rs = obj.objects.all()
 
-    if (start_date and end_date):
-        rs = obj.objects.filter(
-            Q(check_out_date__gte=start_date) & Q(check_in_date__lte=end_date)).values('room_id')
-    else:
-        rs = obj.objects.all()
+    if obj == Guest:
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        if (start_date and end_date):
+            rs = obj.objects.filter(
+                Q(created_at__gte=start_date) & Q(created_at__lte=end_date)
+            )
+            for obj in rs:
+                print("Created at: " + str(obj.created_at))
+        else:
+            rs = obj.objects.all()
 
     # Write headers
     writer.writerow(obj.csv_headers())
