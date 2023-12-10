@@ -1,0 +1,46 @@
+{% extends '_base.html' %}
+
+{% block title %}Datos de Pago{% endblock title %}
+
+{% block content %}
+<div class="p-4 bg-light h-100">
+    <!-- Payment info column -->
+    <div class="col-md-6">
+        <div class="container bg-white border rounded shadow-sm">
+            <!-- Header Row -->
+            <div class="row">
+                <h3 class="fw-bold">Datos de Pago</h3>
+            </div>
+    
+            <!-- Selected rooms -->
+            <div class="row">
+                <div class="container">
+                    <!-- Room image -->
+                    <div class="col-md-6">
+                        <img src="" class="rounded">
+                    </div>
+    
+                    <!-- Room Details-->
+                    <div class="col-md-6">
+                        <p class="lead">Habitación 1 (Jorge Ernesto Lorenzo Méndez)</p>
+                        <p class="fw-bold">Junior Suite</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dividing line -->
+            <hr>
+            
+            <!-- Pay now button -->
+            <div class="row">
+                <button class="btn btn-success">Pagar ahora</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reservation summary column-->
+    <div class="col-md-6">
+        {% include 'booking/stay.html' %}
+    </div>
+</div>
+{% endblock content %}

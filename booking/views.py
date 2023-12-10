@@ -99,6 +99,7 @@ class CreateGuest(LoginRequiredMixin, generic.CreateView):
     model = Guest
     form_class = GuestForm
     template_name = 'booking/guest_details.html'  # Create an HTML template for the form
+    context_object_name = 'form'
 
     def get_success_url(self):
         user_reservation = return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))

@@ -40,6 +40,18 @@ class RoomType(models.Model):
     
     def is_there_room_available(self, r_check_in_date, r_check_out_date):
         return len(self.get_available_rooms(r_check_in_date, r_check_out_date)) > 0
+
+    @staticmethod
+    def csv_file_name():
+        return 'Room_Types'
+    
+    @staticmethod
+    def csv_headers():
+        return ['Type', 'Short Description', 'Description', 'Max Adults', 'Max Children', 'Price']
+    
+    @staticmethod
+    def csv_attributes():
+        return ['', 'short_description','description', 'max_adults', 'max_children']
     
     def __str__(self):
         return self.type
@@ -55,6 +67,18 @@ class Room(models.Model):
         related_name="room_type",
     )
 
+    @staticmethod
+    def csv_file_name():
+        return 'Rooms'
+    
+    @staticmethod
+    def csv_headers():
+        return ['Number', 'Building', 'Avaliability', 'Type']
+    
+    @staticmethod
+    def csv_attributes():
+        return ['number', 'building', 'availability', 'room_type']
+    
     def __str__(self):
         return str(self.number)
 
@@ -192,6 +216,18 @@ class Reservation(models.Model):
         # Set this reservation as complete.
         self.completed = True
         self.save()
+
+    @staticmethod
+    def csv_file_name():
+        return 'Reservations'
+    
+    @staticmethod
+    def csv_headers():
+        return ['Room', 'Adults', 'Children', 'Total Price', 'Check In', 'Check Out']
+    
+    @staticmethod
+    def csv_attributes():
+        return ['room', 'adults', 'children', 'total_price', 'check_in_date', 'check_out_date']
     
     def __str__(self):
         return f"Reservation of {self.user.username}\nNights: {self.nights}\nPrice: {self.reservation_price}\nTaxes: {self.taxes}\nTotal: {self.total_price}" 
@@ -212,6 +248,18 @@ class Guest(models.Model):
     country = models.CharField(max_length=2, default='US')
     postal_code = models.CharField(max_length=20, null=True) 
 
+    @staticmethod
+    def csv_file_name():
+        return 'Guests'
+    
+    @staticmethod
+    def csv_headers():
+        return ['Name', 'Last Name', 'Email', 'Country', 'Postal Code']
+    
+    @staticmethod
+    def csv_attributes():
+        return ['name', 'last_name', 'email', 'country', 'postal_code']
+    
     def __str__(self):
         return f'{self.name} {self.last_name}'
     
