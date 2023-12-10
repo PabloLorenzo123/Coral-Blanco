@@ -17,7 +17,7 @@
         <div class="row" style="width: 90%; margin-left: auto; margin-right: auto;">
             <!--Dates-->
             <div class="col input-group">
-                <input name="check_in_date" type="date" class="form-control" required min="{{ today|date:'Y-m-d' }}" required>
+                <input autofocus name="check_in_date" type="date" class="form-control" required min="{{ today|date:'Y-m-d' }}" required>
                 <input name="check_out_date" type="date" class="form-control" required min="{{ tomorrow|date:'Y-m-d' }}" required>
             </div>
             <div class="col">

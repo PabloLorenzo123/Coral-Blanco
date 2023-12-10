@@ -1,62 +1,94 @@
-{% extends "_base.html" %}
-{% block title %}Registrarse{% endblock title %}
+{% extends '_base.html' %}
+
+{% block title %}Sign Up{% endblock title %}
 
 {% block content %}
-  <div>
-    <div class="col-md-6">
-      <div class="row">
-        <i class="fas fa-hotel fa-3x" style="color: #709085;"></i>
-        <span class="h1 fw-bold mb-0">  Hotel</span>
+<div class="bg-light p-4">
+  <div class="container border rounded p-4 shadow-sm bg-light">
+    <form method="post" action="{% url 'account_signup' %}">
+      {% csrf_token %}
+      <div class="row pb-4">
+        <div class="col md-6">
+          <h2>Registrate</h2>
+        </div>
+        <div class="col md-6">
+        </div>
       </div>
 
       <div class="row">
-        <form method="post" action="{% url 'account_signup' %}">
-          {% csrf_token %}
-          <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Registrarse</h3>
 
-          <!-- Dirección de email -->
-          <div class="form-group mb-4">
-            <input placeholder="Dirección de email" id="{{form.email.id_for_label}}" name="{{form.email.name}}" type="email"  class="form-control form-control-lg"/>
-          </div>
+        <div class="form-group col-md-6">
+           <!-- Dirección de email -->
+          <label>Email</label>
+          <input placeholder="Dirección de email" id="{{form.email.id_for_label}}" name="{{form.email.name}}" type="email"  class="form-control form-control-lg"/>
+        </div>
+
+        <div class="form-group col-md-6">
           <!-- Nombre -->
-          <div class="form-group mb-4">
-            <input placeholder="Nombre" id="{{form.name.id_for_label}}" name="{{form.name.name}}" type="text"  class="form-control form-control-lg"/>
-          </div>
-          <!--Apellidos-->
-          <div class="form-group mb-4">
-            <input placeholder="Apellidos" id="{{form.last_name.id_for_label}}" name="{{form.last_name.name}}" type="text"  class="form-control form-control-lg"/>
-          </div>
+          <label>Nombre</label>
+          <input type="text" class="form-control">
+        </div>
+
+      </div>
+
+      <div class="row">
+
+        <div class="form-group col md-6">
+          <label>Apellidos</label>
+          <input placeholder="Apellidos" id="{{form.last_name.id_for_label}}" name="{{form.last_name.name}}" type="text"  class="form-control form-control-lg"/>
+        </div>
+
+        <div class="form-group col md-6">
+          <label>Telephone</label>
+          <input type="text" class="form-control">
+        </div>
+
+      </div>
+
+      <div class="row">
+
+        <div class="form-group col md-6">
           <!--Fecha de Nacimiento-->
-          <div class="form-group mb-4">
-            <input placeholder="Fecha de Nacimiento" id="{{form.birthdate.id_for_label}}" name="{{form.birthdate.name}}" type="date"  class="form-control form-control-lg"/>
-          </div>
+          <label>Fecha de nacimiento</label>
+          <input placeholder="Fecha de Nacimiento" id="{{form.birthdate.id_for_label}}" 
+          name="{{form.birthdate.name}}" type="date"  class="form-control form-control-lg"/>
+        </div>
+
+        <div class="form-group col md-6">
            <!--Pais-->
-           <div class="form-group mb-4">
-            <input placeholder="País" id="{{form.country.id_for_label}}" name="{{form.country.name}}" type="{{form.country.field.widget.type}}"  class="form-control form-control-lg"/>
-          </div>
-          <!--Contraseña-->
-          <div class="form-group mb-4">           
-              <input placeholder="Contraseña" id="{{form.password1.id_for_label}}" name="{{form.password1.name}}" type="password" class="form-control form-control-lg" />
-          </div>
+          <label>País</label>
+          <select style="font-size: 16px" id="{{form.country.id_for_label}}"  name="{{form.country.name}}" 
+          type="{{form.country.field.widget.type}}"  class="form-control form-control-lg">
+            {% include '_countries.html' %}
+          </select>
+        </div>
 
-          <div class="pt-1 mb-4">
-            <button class="btn btn-info btn-lg btn-block" type="submit">Registrarse</button>
-          </div>
+      </div>
+      
+      <div class="row">
+        <!--Contraseña-->
+        <div class="form-group col md-6">
+          <label>Contraseña</label>
+          <input placeholder="Contraseña" id="{{form.password1.id_for_label}}" 
+          name="{{form.password1.name}}" type="password" class="form-control form-control-lg" />
+        </div>
+      
+      <div class="form-group col md-6">
+      </div>
+      <div class="form-group col md-6">
+      </div>
 
-          {% if form.errors %}
-            <div class="alert alert-danger mt-3">
-              <strong>Error:</strong> Por favor, corrige los siguientes errores e intentelo denuevo.
-                <ul>
-                  {% for field, error_list in form.errors.items %}
-                      {% for error in error_list %}
-                        <li>{{ field|title }}: {{ error }}</li>
-                      {% endfor %}
-                  {% endfor %}
-                </ul>
-            </div>
-          {% endif %}
-        </form>
-        <p>Ya tienes una cuenta? <a href="{% url 'account_login' %}" class="link-info">Inicia sesión</a></p>
-    </div>
+      <div class="row">
+        <div class="col md-6">
+        </div>
+
+        <div class="col md-6 text-center">
+          <button type="submit" class="btn btn-success btn-lg">Registrarse</button>
+        </div>
+
+      </div>
+
+    </form>
+  </div>
 </div>
 {% endblock content %}
