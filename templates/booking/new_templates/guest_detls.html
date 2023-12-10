@@ -1,0 +1,90 @@
+{% extends '_base.html' %}
+
+{% block title %}Detalles del huésped{% endblock title %}
+
+
+{% block content %}
+<div class="bg-light p-4 row h-100">
+    <!-- Form column -->
+    <div class="col-md-6">
+        <div class="container bg-white p-4 border shadow-sm rounded">
+            <form>
+                <!-- 1st row -->
+                <div class="row">
+                    <h3>Información de contacto</h3>
+                </div>
+        
+                <!-- 2nd row -->
+                <div class="row">
+                    <!-- 2nd row, 1st column -->
+                    <div class="col-md-6">
+                        <label class="form-label">Name</label>
+                        <input id="{{ form.name.id }}" class="form-control">
+                    </div>
+        
+                    <!-- 2nd row, 2nd column-->
+                    <div class="col-md-6">
+                        <label class="form-label">Last Name</label>
+                        <input class="form-control">
+                    </div>
+                </div>
+        
+                <!-- 3rd row -->
+                <div class="row">
+        
+                    <!-- 2nd row, 1st column -->
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input class="form-control">
+                    </div>
+        
+                    <!-- 2nd row, 2nd column-->
+                    <div class="col-md-6">
+                        <label class="form-label">Country</label>
+                        <select class="form-select">
+                            <option>RD</option>
+                        </select>
+                    </div>
+                </div>
+        
+                <!-- 4th row -->
+                <div class="row">
+        
+                    <!-- 4th row, 1st column -->
+                    <div class="col-md-6">
+                        <label class="form-label">Postal code</label>
+                        <input class="form-control">
+                    </div>
+        
+                    <!-- 4th row, 2nd column -->
+                    <div class="col-md-6">
+                        <label class="form-label">Card Number</label>
+                        <input class="form-control">
+                    </div>
+                </div>
+        
+                <!-- 5th row -->
+                <div class="row">
+        
+                    <!-- 5th row, 1st column -->
+                    <div class="col-md-6">
+                        <label class="form-label">Expire Date</label>
+                        <input type="date" class="form-control">
+                    </div>
+        
+                    <!-- 5th row, 2nd column -->
+                    <div class="col-md-6">
+                        <label class="form-label">CSV</label>
+                        <input class="form-control">
+                    </div>
+                </div>
+            </form>    
+        </div>
+    </div>
+    
+    <!-- Stay details column -->
+    <div class="col-md-6">
+        {% include 'booking/stay.html' %}
+    </div>
+</div>
+{% endblock content %}
