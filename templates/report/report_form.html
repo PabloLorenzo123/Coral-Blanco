@@ -3,36 +3,34 @@
 {% block title %}Report{% endblock title %}
 
 {% block content %}
-    <div class="p-4 d-flex align-items-center">
-        <div class="container border rounded p-4 shadow-sm">
+    <div class="p-4 bg-light h-100">
+        <div class="container border rounded p-4 shadow-sm bg-white w-50">
             <form method="get" action="{% url 'download_report' %}">
+
+                <!-- Choose (object) of what to make a report of -->
                 <div class="mb-3">
                   <label for="object" class="form-label">Objeto</label>
-                  <select name="object" id="object" class="form-select">
+                  <select name="object" id="object" class="form-select" onchange="disable_dates_inputs(event)">
                     <option value="room_types">Tipos de Habitaciones</option>
                     <option value="rooms">Habitaciones</option>
                     <option value="reservations">Reservaciones</option>
-                    <option value="guests">Guests</option>
+                    <option value="guests">Huéspedes</option>
                   </select>
                 </div>
-                <div class="mb-3">
+
+                <!-- Choose optional date range -->
+                <div class="mb-3 ">
                   <label for="start_date" class="form-label">Fecha de inicio</label>
-                  <input type="date" name="start_date" class="form-control" id="start_date">
+                  <input type="date" name="start_date" class="form-control" id="start_date" disabled>
                   <div id="dateHelp" class="form-text">Opcional.</div>
                 </div>
                 <div class="mb-3">
                     <label for="end_date" class="form-label">Fecha final</label>
-                    <input type="date" name="end_date" class="form-control" id="end_date">
+                    <input type="date" name="end_date" class="form-control" id="end_date" disabled>
                     <div id="dateHelp" class="form-text">Opcional.</div>
                 </div>
-                <div class="mb-3">
-                    <label for="file_type" class="form-label">Tipo de archivo</label>
-                    <select class="form-select" id="file_type">
-                      <option>CSV</option>
-                      <option>PDF</option>
-                      <option>TXT</option>
-                    </select>
-                  </div>
+
+                <!-- Download button-->
                 <button type="submit" class="btn btn-primary">
                   <i class="fas fa-download"></i>
                    Download
@@ -40,5 +38,23 @@
             </form>
         </div>
     </div>
+    <script>
+
+      // This function disables the date inputs if the object doesn't support dates
+      function disable_dates_inputs(event) {
+        select_input = document.getElementById("object")
+        start_date_input = document.getElementById("start_date")
+        end_date_input = document.getElementById("end_date")
     
+        if (select_input.value == "reservations") {
+          start_date_input.disabled = false
+          end_date_input.disabled = false
+        }
+        else
+        {
+          start_date_input.disabled = true
+          end_date_input.disabled = true
+        }
+      }
+    </script>
 {% endblock content %}
