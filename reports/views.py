@@ -7,7 +7,7 @@ from django.db.models import Q
 from datetime import datetime
 import csv
 
-from booking.models import RoomType, Room, RoomReservations, Guest
+from booking.models import RoomType, Room, Reservation, Guest
 
 class SuperUserPassesTestMixin(UserPassesTestMixin):
     def test_func(self):
@@ -21,7 +21,7 @@ class ReportTemplateView(SuperUserPassesTestMixin, TemplateView):
 def report(request, start_date, end_date):
 
     # Get object class
-    obj_class = {'room_types': RoomType, 'rooms': Room, 'reservations': RoomReservations, 'guests' : Guest}
+    obj_class = {'room_types': RoomType, 'rooms': Room, 'reservations': Reservation, 'guests' : Guest}
     obj = obj_class[request.GET.get('object')]
 
     # Send response
@@ -46,16 +46,9 @@ def report(request, start_date, end_date):
     # Write headers
     writer.writerow(obj.csv_headers())
 
-    # List class atrributes
-    attributes = obj.csv_attributes()
-
     # Populate the CSV
     for r in rs:
-        row = []
-        for att in attributes:
-            row.append(str(getattr(r, att, str(r))))
-
-        writer.writerow(row)
+        writer.writerow(r.to_csv())
 
     return response
 
