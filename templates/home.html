@@ -4,30 +4,19 @@
 
 {% block content %}
 <!-- Room searchbar -->
-    <form class="row bg-light p-2" action="{% url 'search_room' %}" method="get">
+    <form id="roomSearchForm" class="row bg-light p-2" action="{% url 'search_room' %}" method="get">
         <div class="row">
             <!--Dates-->
             <div class="col input-group">
-                <input name="check_in_date" type="date" class="form-control">
-                <input name="check_out_date" type="date" class="form-control">
+                <input name="check_in_date" type="date" class="form-control" required min="{{ today|date:'Y-m-d' }}" required>
+                <input name="check_out_date" type="date" class="form-control" required min="{{ tomorrow|date:'Y-m-d' }}" required>
             </div>
-            
             <div class="col">
-                <!--Rooms-->
                 <div class="row">
-                    <div class="col input-group">
-                        <i class="fas fa-bed input-group-text"></i>
-                        <select name="number_of_rooms" class="form-select" >
-                            <option selected>Open this select menu</option>
-                            <option value="1">One</option>
-                            <option value="2">Two</option>
-                            <option value="3">Three</option>
-                        </select>
-                    </div>
                     <!-- adults -->
                     <div class="col input-group">
                         <i class="fas fa-user-friends input-group-text"></i>
-                        <select name="adults" class="form-select" >
+                        <select name="adults" class="form-select" required>
                             <option selected>Open this select menu</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -39,7 +28,7 @@
                     <!--Children-->
                     <div class="col input-group">
                         <i class="fas fa-user-friends input-group-text"></i>
-                        <select name="children" class="form-select">
+                        <select name="children" class="form-select" required>
                             <option selected>Open this select menu</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -50,7 +39,7 @@
                 </div>
             </div>
             <div class="col input-group">
-                <button class="btn btn-success">Buscar</button>
+                <button class="btn btn-success" onclick="validateForm(event)">Buscar</button>
             </div>
         </div>
     </form>     
@@ -67,4 +56,26 @@
                 <a class="btn btn-primary btn-lg" href="{% url 'rooms' %}" role="button">Habitaciones</a>
             </p>
     </div>
+    <script>
+        console.log("klk")
+        function validateForm(event) {
+            event.preventDefault(event)
+    
+            var form = document.getElementById('roomSearchForm');
+            var checkInDate = new Date(form.elements['check_in_date'].value);
+            var checkOutDate = new Date(form.elements['check_out_date'].value);
+            var adults = form.elements['adults'].value;
+            var children = form.elements['children'].value;
+    
+            // Perform validation logic here
+            if (checkInDate >= checkOutDate) {
+                alert("El check in no puede ser después del checkout.");
+            } else if (!checkInDate || !checkOutDate || adults === "Open this select menu" || children === "Open this select menu") {
+                alert("Por favor, llena todos los campos correctamente");
+            } else {
+                // Only submit the form if all conditions are met
+                form.submit();
+            }
+        }
+    </script> 
 {% endblock content %}

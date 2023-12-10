@@ -3,11 +3,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import generic
 from django.http import HttpResponseForbidden, HttpResponse
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import RoomType, Reservation, Guest, RoomReservations
 from .forms import GuestForm
 from .views_helper import RoomSearch, update_user_reservation_if_neccesary, return_reservation_object
-from .confirm_reservation_helper import charge_card, send_confirmation_email
 import booking_project.settings as settings
 
 # Create your views here.
@@ -34,7 +35,8 @@ and display the rooms that are available.
 - Then look for each type of room, and check if it has the capacity requested.
 - Then see if there're room available with no booking between the dates requested.
 - Return a dictionary of all the rooms, indicating if they're available or not, and why."""  
-      
+
+@login_required  
 def search_room(request):
     # first check the user is logged in, with @loginrequired.
     r_adults = int(request.GET.get('adults'))
@@ -67,8 +69,9 @@ def search_room(request):
     # This return will send to the template a dictionary which of objects which have the type of room, and if their avaliability.
     return render(request, 'booking/search_results.html', context)
 
-# logged in mixin.
+
 # this can be a detailview.
+@login_required
 def reservate_now(request, uuid):
     # This is a post request, to add a room to the user's cart.
     # User needs to be logged in, and have a cart (which they're the owner of).
@@ -83,7 +86,7 @@ def reservate_now(request, uuid):
 
     # 3. We now need to set the info of the cart (total_price, taxes, nights)
     user_reservation.set_cart_info()
-    print(user_reservation)
+    print(user_reservation.uuid)
 
     context = {
         'user_reservation': user_reservation,
@@ -91,7 +94,8 @@ def reservate_now(request, uuid):
 
     return render(request, 'booking/reservation_detail.html', context)
 
-class CreateGuest(generic.CreateView):
+
+class CreateGuest(LoginRequiredMixin, generic.CreateView):
     model = Guest
     form_class = GuestForm
     template_name = 'booking/guest_details.html'  # Create an HTML template for the form
@@ -111,11 +115,12 @@ class CreateGuest(generic.CreateView):
         return form_context
     
     def dispatch(self, request, *args, **kwargs):
-        # Check if the user already has a guest associated with their cart
-        user_reservation = return_reservation_object(request=self.request, uuid=kwargs.get('uuid')) # This is the uuid at the end of the url.
+        # Check if the user already has a guest associated with their reservation.
+        user_reservation = return_reservation_object(
+            request=self.request, uuid=kwargs.get('uuid')) # This is the uuid at the end of the url.
 
         if Guest.objects.filter(user_reservation=user_reservation).exists():
-            # In case the user's cart already has a guest associated, let's update it.
+            # In case the user's reservation already has a guest associated, let's update it.
             update_view_url = reverse('update_guest', kwargs={'uuid': kwargs.get('uuid')})
             return redirect(update_view_url)
 
@@ -139,7 +144,7 @@ class CreateGuest(generic.CreateView):
     def form_invalid(self, form):
         return super().form_invalid(form)
     
-class UpdateGuest(generic.UpdateView):
+class UpdateGuest(LoginRequiredMixin, generic.UpdateView):
     model = Guest
     form_class = GuestForm
     template_name = 'booking/update_guest_details.html'
@@ -153,14 +158,14 @@ class UpdateGuest(generic.UpdateView):
         return Guest.objects.get(user_reservation=user_reservation)
     
     def dispatch(self, request, *args, **kwargs):
-        # Check if the user has a cart, and if the cart of this template is his.
+        # Check if the user has a reservation, and if the reservation of this template is his.
         # This is the uuid at the end of the url.
         return_reservation_object(request=self.request, uuid=self.kwargs.get('uuid'))
         return super().dispatch(request, *args, **kwargs)
 
 
 """Confirm reservation"""
-class ConfirmReservation(generic.DetailView):
+class ConfirmReservation(LoginRequiredMixin, generic.DetailView):
     model = Reservation
     template_name = "booking/confirm_reservation.html"
     context_object_name = "user_reservation"
@@ -168,6 +173,7 @@ class ConfirmReservation(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['stripe_key'] = settings.STRIPE_TEST_PUBLISHABLE_KEY
+        context['stripe_price'] = self.get_object().total_price * 100 # Because stripe price is in cents.
         return context
     
     def get_object(self):
@@ -199,6 +205,7 @@ The error can be either there's no room available, or the credit_card specified 
 
 """
 stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
+@login_required
 def payment_confirm_reservation_done(request, uuid):   
     user_reservation = return_reservation_object(request, uuid)
     # Defining the context.
@@ -210,17 +217,25 @@ def payment_confirm_reservation_done(request, uuid):
     if not user_reservation.room_type.is_there_room_available(user_reservation.check_in_date, user_reservation.check_out_date):
         user_reservation.delete()
         return HttpResponse('Ya no hay habitación disponible, intentelo denuevo.')
+    
+    """Payment"""
     # Try to process the payment.
     try:
         if request.method == 'POST':
             charge = stripe.Charge.create(
-            amount=3900,
+            amount=user_reservation.total_price,
             currency='usd',
-            description='Purchase all books',
-            source=request.POST['stripeToken']
+            description='Reservar habitación' + user_reservation.room_type.type,
+            source=request.POST['stripeToken'],
         )
+        # Let's save the token of this transaction, so we can refund, and charge in the future.
+        user_reservation.payment_token = charge.id
+        user_reservation.card_last4 = charge.source['last4']
+        user_reservation.card_brand = charge.source['brand']
     except:
         return HttpResponse('No se pudo procesar el pago, intentelo denuevo.')
+    
+    """Room asignment"""
     # Assign room to the reservation.
     user_reservation.room = user_reservation.room_type.get_available_rooms(
         user_reservation.check_in_date, user_reservation.check_out_date
@@ -238,7 +253,7 @@ def payment_confirm_reservation_done(request, uuid):
  
     return render(request, 'booking/confirm_reservation_done.html', context)
 
-class ReservationDetail(generic.DetailView):
+class ReservationDetail(LoginRequiredMixin, generic.DetailView):
     model = Reservation
     context_object_name = 'user_reservation'
     template_name = 'confirmed_reservation_detail.html'

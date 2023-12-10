@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.core.mail import EmailMessage
 import booking_project.settings as settings
+from django.template.loader import render_to_string
 
 # Create your models here.
 
@@ -127,6 +128,11 @@ class Reservation(models.Model):
     reservation_price = models.DecimalField(decimal_places=2, max_digits=8, null=True)
     taxes = models.DecimalField(decimal_places=2, max_digits=8, null=True)
     total_price = models.DecimalField(decimal_places=2, max_digits=8, null=True)
+    """Stripe"""
+    # Stripe payment token, with this token we can refund and charge in the future.
+    card_payment_token = models.CharField(max_length=100, null=True)
+    card_last4 = models.CharField(max_length=4, null=True)
+    card_brand = models.CharField(max_length=10, null=True)
 
     room_type = models.ForeignKey(
         RoomType,
@@ -159,10 +165,23 @@ class Reservation(models.Model):
         # First create an identifier.
         self.create_unique_identifier()
         self.save()
+        html_content = render_to_string('booking/email/confirm_reservation_email.html', 
+                                        {'reservation': self,
+                                         'check_in_weekday': self.check_in_date.strftime("%A"),
+                                         'check_in_day': self.check_in_date.day,
+                                         'check_in_month': self.check_in_date.strftime("%B"),
+                                         'check_in_year': self.check_in_date.year,
+
+                                         'check_out_weekday': self.check_out_date.strftime("%A"),
+                                         'check_out_day': self.check_out_date.day,
+                                         'check_out_month': self.check_out_date.strftime("%B"),
+                                         'check_out_year': self.check_out_date.year,
+                                        })
+        subject = f"{self.guest.name} aquí tiene su confirmación de reserva en CoralBlanco"
         # Create an EmailMessage object.
         email = EmailMessage(
-            subject= f"{self.guest.name} aquí tiene su confirmación de reserva en CoralBlanco",
-            body = f"<h1>{self.unique_identifier}</h1>",
+            subject,
+            html_content,
             from_email= settings.DEFAULT_FROM_EMAIL,
             to = [self.guest.email],
         )
@@ -189,13 +208,9 @@ class Guest(models.Model):
 
     name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    email = models.EmailField(null=True)
-
-    country = models.CharField(max_length=255)
-    postal_code = models.CharField(max_length=20)  # Adjust max_length based on your requirements
-    card_number = models.CharField(max_length=16)  # Assuming a typical credit card number length
-    expire_date = models.CharField(max_length=7)   # Assuming MM/YYYY format for expiration date
-    csv = models.CharField(max_length=4)           # Assuming a typical CSV length
+    email = models.EmailField()
+    country = models.CharField(max_length=2, default='US')
+    postal_code = models.CharField(max_length=20, null=True) 
 
     def __str__(self):
         return f'{self.name} {self.last_name}'
