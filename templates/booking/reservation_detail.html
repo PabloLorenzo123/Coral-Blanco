@@ -3,8 +3,12 @@
 {% block title %}Tu estadia{% endblock title %}
 
 {% block content %}
-{% include 'booking/_stay.html' %}
-<button>
-    <a href="{% url 'guest_details' user_reservation.uuid %}">Siguiente paso</a>
-</button>
+
+<div class="p-4 bg-light h-100">
+    {% include 'booking/_stay.html' %}
+    <div class="container bg-transparent" style="width: 26rem;">
+        <a class="btn btn-success shadow-sm w-100 " href="{% url 'guest_details' user_reservation.uuid %}">Siguiente paso</a>
+    </div>
+</div>
+
 {% endblock content %}

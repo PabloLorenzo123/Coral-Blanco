@@ -3,14 +3,16 @@
 {% block title %}Area privada{% endblock title %}
 
 {% block content %}
-<p>Desde esta pagina podrás acceder a tu información y gestionarla</p>
-<h1>
-    Hola, {{user.name}}
-</h1>
-<p>
-    Estadias: {{user.stays}}
-</p>
-<a href="{% url 'update_user' user.uuid %}">Mi información</a>
-<a href="{% url 'user_reservations' %}">Reservaciones</a>
-
+<div class="p-4 bg-light h-100">
+    <div class="container bg-white p-4 border shadow-sm w-50">
+        <div>
+            <h1>Hola, {{ user.name }}!</h1>
+            <p>
+                Estadías: {{ user.stays }}
+            </p>
+        </div>
+        <a class="btn btn-success btn-lg mt-4" href="{% url 'update_user' user.uuid %}">Mi información</a>
+        <a class="btn btn-success btn-lg mt-4" href="{% url 'user_reservations' %}">Reservaciones</a>
+    </div>
+</div>
 {% endblock content %}
