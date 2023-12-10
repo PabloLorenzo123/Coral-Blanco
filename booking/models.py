@@ -27,6 +27,7 @@ class RoomType(models.Model):
     max_children = models.IntegerField(blank=True, null=True)
     
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    
 
     def get_available_rooms(self, r_check_in_date, r_check_out_date):
         return Room.objects.filter(
@@ -71,10 +72,10 @@ class Room(models.Model):
     
     @staticmethod
     def csv_headers():
-        return ['Number', 'Type']
+        return ['Number', 'Type', 'Avaibility']
     
     def to_csv(self):
-        return [self.number, self.type]
+        return [self.number, self.type, ]
     
     def __str__(self):
         return str(self.number)
@@ -103,6 +104,7 @@ class Feature(models.Model):
     
     def __str__(self):
         return self.feature
+
 
 class RoomFeature(models.Model):
     room_type = models.ForeignKey(
@@ -149,6 +151,8 @@ class Reservation(models.Model):
     reservation_price = models.DecimalField(decimal_places=2, max_digits=8, null=True)
     taxes = models.DecimalField(decimal_places=2, max_digits=8, null=True)
     total_price = models.DecimalField(decimal_places=2, max_digits=8, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)  # To keep track of when a reservation has been registered
 
     room_type = models.ForeignKey(
         RoomType,
@@ -230,6 +234,8 @@ class Guest(models.Model):
     card_number = models.CharField(max_length=16)  # Assuming a typical credit card number length
     expire_date = models.CharField(max_length=7)   # Assuming MM/YYYY format for expiration date
     csv = models.CharField(max_length=4)           # Assuming a typical CSV length
+
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)  # To keep track of when a guest has been registered
 
     @staticmethod
     def csv_file_name():
