@@ -33,7 +33,8 @@ def report(request, start_date, end_date):
     # Writer
     writer = csv.writer(response)
 
-    # Get all instances of the class
+    # If reservation option was choosen and a start and end date was chosen then we filter the database
+    # otherwise we don't filter anything.
     if obj == Reservation:
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
@@ -41,27 +42,39 @@ def report(request, start_date, end_date):
             rs = obj.objects.filter(
                 Q(check_out_date__gte=start_date) & Q(check_in_date__lte=end_date)
             )
+        # Nothing to filter so obtain all objects from the database
         else:
             rs = obj.objects.all()
 
-    if obj == Guest:
+    # If guest option was choosen and a start and end date was chosen then we filter the database,
+    # otherwise we don't filter anything
+    elif obj == Guest:
         start_date = request.GET.get('start_date')
         end_date = request.GET.get('end_date')
         if (start_date and end_date):
             rs = obj.objects.filter(
                 Q(created_at__gte=start_date) & Q(created_at__lte=end_date)
             )
-            for obj in rs:
-                print("Created at: " + str(obj.created_at))
+        # Nothing to filter so obtain all objects from the database
         else:
             rs = obj.objects.all()
+
+    # Else get all instances of the chosen class
+    else:
+        rs = obj.objects.all()
 
     # Write headers
     writer.writerow(obj.csv_headers())
 
-    # Populate the CSV
-    for r in rs:
-        writer.writerow(r.to_csv())
+    # If guest was chosen then we gotta write rows with the avaibility field
+    if obj == Guest:
+        # Populate the CSV
+        for r in rs:
+            writer.writerow(r.to_csv(start_date, end_date))
+    else:
+        # Populate the CSV
+        for r in rs:
+            writer.writerow(r.to_csv())
 
     return response
 
