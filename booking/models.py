@@ -258,7 +258,7 @@ class Reservation(models.Model):
         return f"Reservado en {self.created_at.year}-{self.created_at.month}-{self.created_at.day}, Habitación:{self.room_type}, ({self.check_in_date}-{self.check_out_date}) Precio total: {self.total_price}" 
     
     def to_csv(self):
-        return [self.room, self.adults, self.children, self.total_price, self.check_in_date, self.check_out_date]
+        return [self.room, self.user.id , self.adults, self.children, self.total_price, self.check_in_date, self.check_out_date]
 
     def __str__(self):
         return f"Reservación de {self.user.name}, {self.user.last_name}-({self.check_in_date}-{self.check_out_date})-Habitación:{self.room_type}-Noches: {self.nights}-Precio: {self.reservation_price}-Taxes: {self.taxes}-Total: {self.total_price}" 
@@ -269,7 +269,7 @@ class Reservation(models.Model):
     
     @staticmethod
     def csv_headers():
-        return ['Habitación', 'Adúltos', 'Niños', 'Precio Total', 'Check In', 'Check Out']
+        return ['Habitación', 'Cliente', 'Adúltos', 'Niños', 'Precio Total', 'Check In', 'Check Out']
 
 # This table will relate to the user's reservation, it contains the guest info.
 class Guest(models.Model):
