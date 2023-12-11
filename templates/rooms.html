@@ -3,7 +3,7 @@
 {% block title %}Hotel{% endblock title %}
 
 {% block content %}
-    <div class="p-4 bg-light">
+    <div class="p-4 bg-light h-100">
     {% for type in room_types %}
         <div class="card mb-4 shadow" style="height: 250px;">
             <div class="row g-0">
@@ -26,15 +26,20 @@
                                         <li class="d-flex">
                                             <div class="d-flex align-items-center">
                                                 <i class="fas fa-check" style="color: gray;"></i>
-                                                <p class="card-text mx-2">{{ feature.feature.feature }}</p>
+                                                <p class="card-text mx-2">{{ feature }}</p>
                                             </div>
                                         </li>
                                     {% endif %}
                                 {% endfor %}
                             </ul>
                         </div>
-                        <div class="text-end">
-                            <button class="btn btn-outline-success btn-lg"><a href="{% url 'home' %}">Reservar</a></button>
+                        <div class="row text-end">
+                            <div class="col-md-6 text-start"> 
+                                <p><b>{{ type.max_adults|add:type.max_children }} Personas,</b> {{ type.max_adults }} adultos máx / {{ type.max_children }} niños máx.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <a class="btn btn-outline-success btn-lg" href="{% url 'home' %}">Reservar</a>
+                            </div>
                         </div>
                         
                     </div>

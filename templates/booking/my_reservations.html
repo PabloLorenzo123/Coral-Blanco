@@ -30,76 +30,78 @@
                 </div>
                 {% for user_reservation in reservations %}
                 <!-- Reservation body -->
-                <div class="container card mb-3 shadow-sm" style="max-width: 26rem;">
-                    <div class="card-header bg-transparent">
-                        <p><h6 class="fw-bold">Reservación {{ forloop.counter }}</h6></p>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p>Check-In</p>
+                <div class="row d-flex">
+                    <div class="container card mb-3 shadow-sm" style="max-width: 26rem;">
+                        <div class="card-header bg-transparent">
+                            <p><h6 class="fw-bold">Reservación {{ forloop.counter }}</h6></p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>Check-In</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>Check-out</p>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <p>Check-out</p>
+                            <div class="row">
+                                {% with dates=user_reservation.dates_to_human_format %}
+                                <div class="col-md-6">
+                                    <p class="fw-bold">{{dates.check_in_weekday}}, {{dates.check_in_day}} de {{dates.check_in_month}} 
+                                        de {{dates.check_in_year}} a las 15:00h</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="fw-bold">{{dates.check_out_weekday}}, {{dates.check_out_day}} de {{dates.check_out_month}} 
+                                        de {{dates.check_out_year}} a las 12:00h</p>
+                                </div>
+                                {% endwith %}
+                            </div>
+                            <div class="row">
+                                <p>{{user_reservation.nights}} noche(s)</p>
                             </div>
                         </div>
-                        <div class="row">
-                            {% with dates=user_reservation.dates_to_human_format %}
-                            <div class="col-md-6">
-                                <p class="fw-bold">{{dates.check_in_weekday}}, {{dates.check_in_day}} de {{dates.check_in_month}} 
-                                    de {{dates.check_in_year}} a las 15:00h</p>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <p>Habitación</p>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <p class="fw-bold">{{dates.check_out_weekday}}, {{dates.check_out_day}} de {{dates.check_out_month}} 
-                                    de {{dates.check_out_year}} a las 12:00h</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="fw-light">
+                                        <a href="{% url 'room_detail' user_reservation.room_type.uuid %}" class="fw-normal">{{user_reservation.room_type}}</a>
+                                        <br>{{user_reservation.adults}} adulto(s).
+                                        {% if user.reservation.children > 0 %}
+                                        <br>{{user_reservation.children}} niños
+                                        {% endif %}
+                                        <br>Pague ahora con todo incluido
+                                        <br>No reembolsable
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="fw-bold">USD {{user_reservation.reservation_price}}</p>
+                                </div>
                             </div>
-                            {% endwith %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="fw-bold">Impuestos y Tasas</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="fw-bold">USD {{user_reservation.taxes}}</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="row">
-                            <p>{{user_reservation.nights}} noche(s)</p>
+                        <div class="card-footer bg-transparent">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p>Total:</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="fw-bold">USD {{user_reservation.total_price}}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <p>Habitación</p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="fw-light">
-                                    <a href="{% url 'room_detail' user_reservation.room_type.uuid %}" class="fw-normal">{{user_reservation.room_type}}</a>
-                                    <br>{{user_reservation.adults}} adulto(s).
-                                    {% if user.reservation.children > 0 %}
-                                    <br>{{user_reservation.children}} niños
-                                    {% endif %}
-                                    <br>Pague ahora con todo incluido
-                                    <br>No reembolsable
-                                </p>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="fw-bold">USD {{user_reservation.reservation_price}}</p>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p class="fw-bold">Impuestos y Tasas</p>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="fw-bold">USD {{user_reservation.taxes}}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p>Total:</p>
-                            </div>
-                            <div class="col-md-6">
-                                <p class="fw-bold">USD {{user_reservation.total_price}}</p>
-                            </div>
-                        </div>
-                    </div>
+                {% endfor %}
                 </div>
-            {% endfor %}
         </div>
     </div>
 </div>

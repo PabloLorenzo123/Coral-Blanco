@@ -23,8 +23,8 @@ class CustomUserAdmin(UserAdmin):
     )
 
 # Styling admin 
-admin.site.site_header = "Hotel"
-admin.site.site_title = "Hotel administration"
-admin.site.index_title = "Hotel administration"
+admin.site.site_header = "Coral Blanco"
+admin.site.site_title = "Administración Hotel Coral Blanco"
+admin.site.index_title = "Administración Hotel Coral Blanco"
 
 admin.site.register(CustomUser, CustomUserAdmin)

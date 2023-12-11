@@ -127,11 +127,14 @@ class RoomFeature(models.Model):
         on_delete=models.CASCADE,
         related_name='features'
     )
-    feature = models.ForeignKey(
+    feature_id = models.ForeignKey(
         Feature,
         on_delete=models.CASCADE,
-        related_name='room_types'
+        related_name='room_types',
     )
+
+    def __str__(self):
+        return self.feature_id.feature
 
 
 """Reservation"""

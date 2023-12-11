@@ -27,8 +27,21 @@ def report(request, start_date, end_date):
     # Send response
     response = HttpResponse(content_type='text/csv;')
     
+    # Get start date and end date
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
     # Get file name according to the class and update response
-    response['Content-Disposition'] = f'attachment; filename={obj.csv_file_name()} {str(datetime.now().date().strftime("%m-%d-%Y"))}.csv'
+
+    # Format file name according to the given dates or not given
+    file_date = ""
+    if (start_date and end_date):
+        file_date = f'({datetime.strptime(start_date, "%Y-%m-%d").strftime("%m-%d-%Y")}) - ({datetime.strptime(end_date, "%Y-%m-%d").strftime("%m-%d-%Y")})'
+    else:
+        file_date = f'{str(datetime.now().date().strftime("%m-%d-%Y"))}'
+
+    # Name file
+    response['Content-Disposition'] = f'attachment; filename={obj.csv_file_name()} {file_date}.csv'
 
     # Writer
     writer = csv.writer(response)
@@ -36,8 +49,6 @@ def report(request, start_date, end_date):
     # If reservation option was choosen and a start and end date was chosen then we filter the database
     # otherwise we don't filter anything.
     if obj == Reservation:
-        start_date = request.GET.get('start_date')
-        end_date = request.GET.get('end_date')
         if (start_date and end_date):
             rs = obj.objects.filter(
                 Q(check_out_date__gte=start_date) & Q(check_in_date__lte=end_date)
@@ -49,8 +60,6 @@ def report(request, start_date, end_date):
     # If guest option was choosen and a start and end date was chosen then we filter the database,
     # otherwise we don't filter anything
     elif obj == Guest:
-        start_date = request.GET.get('start_date')
-        end_date = request.GET.get('end_date')
         if (start_date and end_date):
             rs = obj.objects.filter(
                 Q(created_at__gte=start_date) & Q(created_at__lte=end_date)
