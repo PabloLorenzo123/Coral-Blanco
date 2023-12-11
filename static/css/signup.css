@@ -2,7 +2,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: url('https://pbs.twimg.com/media/DvLKBCZX4AAS3X-.jpg') no-repeat center center fixed;
+  background: url('rooms/DvLKBCZX4AAS3X-.jpg') no-repeat center center fixed;
   background-size: cover;
 }
 
@@ -57,7 +57,7 @@ body {
     box-sizing: border-box;
     font-size: 16px;
     appearance: none;
-    background-image: url('dropdown-arrow.png');
+    background-image: url('rooms/dropdown-arrow.png');
     background-repeat: no-repeat;
     background-position: right center;
   }
