@@ -1,16 +1,6 @@
 {% extends '_base.html' %}
 
-{% block title %}Hotel{% endblock title %}
-
-{% block extra_css %}
-    <style>
-        .p-text {
-            text-align: justify;
-            font-size: 14px;
-        }
-    </style>
-{% endblock extra_css %}
-
+{% block title %}Coral Blanco{% endblock title %}
 {% block search_bar %}
 <!-- Room searchbar -->
     <form id="roomSearchForm" class="bg-light p-2" action="{% url 'search_room' %}" method="GET">
@@ -38,7 +28,7 @@
                     <div class="col input-group">
                         <i class="fas fa-user-friends input-group-text"></i>
                         <select name="children" class="form-select" required>
-                            <option value="0" selected>Niños</option>
+                            <option disable selected>Niños</option>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -118,7 +108,7 @@
                     <!-- Second section -->
                     <section>
                         <h6 class="fw-bold">
-                            Coral Blanco ofrece un entorno paradisíaco para relajar y practicar un sinfín de actividades.
+                            Barceló Bávaro Palace ofrece un entorno paradisíaco para relajar y practicar un sinfín de actividades.
                         </h6>
                         <p class="fst-normal p-text">
                             La gran oferta de uno de los mejores resorts todo incluido de Punta Cana,
@@ -133,7 +123,8 @@
                         </p>
                         <p class="fst-normal p-text">
                             Despertar en un entorno paradisíaco y optar entre el más placentero relax o la mejor variedad de actividades es todo en lo que un huésped
-                            del CoralBlanco tiene que pensar.
+                            del Barceló Bávaro Palace tiene que pensar. Un hotel todo incluido que forma parte del magnífico Barceló Bávaro Grand Resort, 
+                            conformado por el Barceló Bávaro Beach - Solo Adultos y el Barceló Bávaro Palace.
                         </p>
                     </section>
                 </div>
@@ -149,7 +140,7 @@
                         </div>
                         <div class="card-body">
                             <h5 class="card-title">Coral Blanco</h5>
-                            <p class="card-text">Locacalización.</p>
+                            <p class="card-text">Locación.</p>
                             <a href="#" class="btn btn-primary">Marcar ruta</a>
                         </div>
                     </div>
@@ -166,7 +157,7 @@
                     </h3>
                     <p class="fst-normal p-text">
                         Disfruta de unas perfectas vacaciones con todo incluido 
-                        en Punta Cana con los mejores servicios e instalaciones del CoralBlanco: 
+                        en Punta Cana con los mejores servicios e instalaciones del Barceló Bávaro Palace: 
                         restaurantes y bares para todos los gustos, piscinas, entretenimiento para toda la familia,
                         actividades deportivas y servicios Premium para garantizar a los huéspedes más exigentes una 
                         estancia de lujo.
