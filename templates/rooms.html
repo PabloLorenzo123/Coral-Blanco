@@ -33,8 +33,13 @@
                                 {% endfor %}
                             </ul>
                         </div>
-                        <div class="text-end">
-                            <a class="btn btn-outline-success btn-lg" href="{% url 'home' %}">Reservar</a>
+                        <div class="row text-end">
+                            <div class="col-md-6 text-start"> 
+                                <p><b>{{ type.max_adults|add:type.max_children }} Personas,</b> {{ type.max_adults }} adultos máx / {{ type.max_children }} niños máx.</p>
+                            </div>
+                            <div class="col-md-6">
+                                <a class="btn btn-outline-success btn-lg" href="{% url 'home' %}">Reservar</a>
+                            </div>
                         </div>
                         
                     </div>

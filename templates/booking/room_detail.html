@@ -13,6 +13,7 @@
                         <h2>{{ room.type }}</h2>
                     </div>
                     <div class="row pt-4">
+                        <p><b>{{ room.max_adults|add:room.max_children }} Personas,</b> {{ room.max_adults }} adultos máx / {{ room.max_children }} niños máx.</p>
                         <p>{{ room.description }}</p>
                     </div>
                 </div>
