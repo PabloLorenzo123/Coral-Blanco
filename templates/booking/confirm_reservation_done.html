@@ -16,7 +16,8 @@
                 <div class="row">
                     <div class="container">
                         <p>Los detalles de la reservación fueron enviados a {{user_reservation.guest.email}}</p>
-                        <p>Identificador único: {{user_reservation.unique_identifier}}</p>
+                        <p>Identificador único: 
+                            <a href="{% url 'reservation_detail' user_reservation.uuid %}">{{user_reservation.unique_identifier}}</a></p>
                     </div>
                 </div>
 

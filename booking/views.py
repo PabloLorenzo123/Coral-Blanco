@@ -87,7 +87,7 @@ def reservate_now(request, uuid):
     user_reservation.save()
 
     # 3. We now need to set the info of the cart (total_price, taxes, nights)
-    user_reservation.set_cart_info()
+    user_reservation.set_reservation_info()
     print(user_reservation.uuid)
 
     context = {
@@ -254,6 +254,7 @@ def payment_confirm_reservation_done(request, uuid):
         user_reservation.payment_token = charge.id
         user_reservation.card_last4 = charge.source['last4']
         user_reservation.card_brand = charge.source['brand']
+        user_reservation.save()
     except stripe.error.StripeError as e:
         print(f"Stripe error: {e.error.message}")
         return HttpResponse('No se pudo procesar el pago, intentelo denuevo.')
@@ -263,6 +264,7 @@ def payment_confirm_reservation_done(request, uuid):
     user_reservation.room = user_reservation.room_type.get_available_rooms(
         user_reservation.check_in_date, user_reservation.check_out_date
         )[0]
+    user_reservation.save()
     # Complete the reservation. Once complete all the links behind are not accesible.
     # Create RoomReservation, to keep track the reservations of a room.
     RoomReservations.objects.create(
@@ -274,7 +276,6 @@ def payment_confirm_reservation_done(request, uuid):
     # Send confirmation email.
     user_reservation.send_confirmation_email()
 
- 
     return render(request, 'booking/confirm_reservation_done.html', context)
 
 

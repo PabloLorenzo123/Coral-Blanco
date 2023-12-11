@@ -51,11 +51,14 @@ class RoomType(models.Model):
 
     @staticmethod
     def csv_file_name():
-        return 'Room_Types'
+        return 'Tipos de Habitación'
     
     @staticmethod
     def csv_headers():
-        return ['Type', 'Short Description', 'Description', 'Max Adults', 'Max Children', 'Price']
+        return ['Tipo', 'Descripción Corta', 'Descripción', 'Adúltos Máximos', 'Niños Máximos', 'Precio']
+    
+    def to_csv(self):
+        return [self.type, self.short_description, self.description, self.max_adults, self.max_children, self.price]
 
 class Room(models.Model):
     room_id = models.AutoField(primary_key=True)
@@ -68,18 +71,6 @@ class Room(models.Model):
         related_name="room_type",
     )
 
-    @staticmethod
-    def csv_file_name():
-        return 'Rooms'
-    
-    @staticmethod
-    def csv_headers():
-        return ['Number', 'Type', 'Avaibility']
-    
-    def to_csv(self):
-        return [self.number, self.type, ]
-    
-    
     """This method returns if a certain room is available."""
     def is_available(self, check_in_date, check_out_date):
         return self.room_id in Room.objects.filter(
@@ -89,6 +80,17 @@ class Room(models.Model):
                     Q(check_out_date__gt=check_in_date) & Q(check_in_date__lt=check_out_date))
                     .values('room_id')
             )
+
+    @staticmethod
+    def csv_file_name():
+        return 'Habitaciones'
+    
+    @staticmethod
+    def csv_headers():
+        return ['Número', 'Tipo', 'Disponibilidad']
+    
+    def to_csv(self, avaibility):
+        return [self.number, self.type, avaibility]
     
     def __str__(self):
         return str(self.number)
@@ -187,7 +189,7 @@ class Reservation(models.Model):
     completed = models.BooleanField(default=False)
 
     """This set's the reservation information, as its price, its taxes and calculates total price."""
-    def set_cart_info(self):
+    def set_reservation_info(self):
          self.nights = (self.check_out_date - self.check_in_date).days
 
          self.reservation_price = float(self.nights * self.room_type.price)
@@ -258,7 +260,7 @@ class Reservation(models.Model):
     
     @staticmethod
     def csv_headers():
-        return ['Room', 'Adults', 'Children', 'Total Price', 'Check In', 'Check Out']
+        return ['Habitación', 'Adúltos', 'Niños', 'Precio Total', 'Check In', 'Check Out']
 
 # This table will relate to the user's reservation, it contains the guest info.
 class Guest(models.Model):
@@ -286,11 +288,12 @@ class Guest(models.Model):
     
     @staticmethod
     def csv_file_name():
-        return 'Guests'
+        return 'Huéspedes'
     
     @staticmethod
     def csv_headers():
-        return ['Name', 'Last Name', 'Email', 'Country', 'Postal Code']
+        return ['Nombre', 'Apellido', 'Email', 'Pais', 'Código Postal']
+    
     
 
 """Room Reservations refers to the tables that contain all the reservations that have been made to a room."""
