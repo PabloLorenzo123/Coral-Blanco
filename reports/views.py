@@ -76,9 +76,11 @@ def report(request, start_date, end_date):
     writer.writerow(obj.csv_headers())
 
     # If guest was chosen then we gotta write rows with the avaibility field
-    if obj == Guest:
+    if obj == Room:
         # Populate the CSV
         for r in rs:
+            print("ssstarttt ---- " + start_date)
+            print(end_date)
             writer.writerow(r.to_csv(start_date, end_date))
     else:
         # Populate the CSV

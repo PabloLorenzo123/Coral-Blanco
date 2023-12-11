@@ -74,7 +74,7 @@ class Room(models.Model):
     """This method returns if a certain room is available."""
     def is_available(self, check_in_date, check_out_date):
         return self.room_id in Room.objects.filter(
-                type = self.room_type_id,
+                type = self.type,
             ).exclude(
                 room_id__in = RoomReservations.objects.filter(
                     Q(check_out_date__gt=check_in_date) & Q(check_in_date__lt=check_out_date))
@@ -89,7 +89,13 @@ class Room(models.Model):
     def csv_headers():
         return ['Número', 'Tipo', 'Disponibilidad']
     
-    def to_csv(self, avaibility):
+    def to_csv(self, start_date, end_date):
+        avaibility = ''
+        if (self.is_available(start_date, end_date)):
+            avaibility = 'No disponible'
+        else:
+            avaibility = 'Disponible'
+
         return [self.number, self.type, avaibility]
     
     def __str__(self):
