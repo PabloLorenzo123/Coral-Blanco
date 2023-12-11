@@ -252,7 +252,7 @@ class Reservation(models.Model):
         return [self.room, self.adults, self.children, self.total_price, self.check_in_date, self.check_out_date]
 
     def __str__(self):
-        return f"Reservación de {self.user.name}, {self.user.last_name}-({self.check_in_date}-{self.check_out_date})-Habitación:{self.room_type}-Noches: {self.nights}-Precio: {self.reservation_price}-Taxes: {self.taxes}-Total: {self.total_price}" 
+        return f"Reservación de {self.guest.name}, {self.user.last_name}-({self.check_in_date}-{self.check_out_date})-Habitación:{self.room_type}-Noches: {self.nights}-Precio: {self.reservation_price}-Taxes: {self.taxes}-Total: {self.total_price}" 
     
     @staticmethod
     def csv_file_name():

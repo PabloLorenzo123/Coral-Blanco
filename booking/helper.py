@@ -21,7 +21,7 @@ class RoomSearch:
         
         elif self.room_fits and not self.room_is_available:
             self.room_can_be_select = False
-            self.status = "Esta habitación no se encuentra disponible"
+            self.status = "Esta habitación no se encuentra disponible, talvez se encuentre en otras fechas."
 
 """This function creates a Reservation, and returns the object."""
 def create_reservation(request, r_adults, r_children, r_check_in_date, r_check_out_date):
