@@ -2,7 +2,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: url('rooms/DvLKBCZX4AAS3X-.jpg') no-repeat center center fixed;
+  background: white;
   background-size: cover;
 }
 
@@ -57,7 +57,7 @@ body {
     box-sizing: border-box;
     font-size: 16px;
     appearance: none;
-    background-image: url('rooms/dropdown-arrow.png');
+    background-image: white;
     background-repeat: no-repeat;
     background-position: right center;
   }
