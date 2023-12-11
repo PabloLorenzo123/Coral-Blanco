@@ -39,13 +39,17 @@
         </div>
     </div>
     <script>
+       // Set the default value to today's date
+      document.getElementById('start_date').valueAsDate = new Date();
+      document.getElementById('end_date').valueAsDate = new Date();
+
       // This function disables the date inputs if the object doesn't support dates
       function disable_dates_inputs(event) {
         select_input = document.getElementById("object")
         start_date_input = document.getElementById("start_date")
         end_date_input = document.getElementById("end_date")
     
-        if (select_input.value == "reservations" || select_input.value == 'guests') {
+        if (select_input.value == "reservations" || select_input.value == 'guests' || select_input.value == 'rooms') {
           start_date_input.disabled = false
           end_date_input.disabled = false
         }

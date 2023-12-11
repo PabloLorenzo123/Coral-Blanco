@@ -3,10 +3,10 @@
 {% block title %}Mis reservaciones{% endblock title %}
 
 {% block content %}
-<div class="p-4 bg-light h-100">
+<div class="p-4 h-100">
     <div class="row">
         <div class="col-md-4">
-            <div class="container bg-white p-4 border shadow-sm h-100"">
+            <div class="container bg-light p-4 border shadow-sm ">
                 <div>
                     <h1>Hola, {{ user.name }}!</h1>
                     <ul class="list-unstyled pt-4">
@@ -23,14 +23,15 @@
         </div>
         <div class="col-md-8">
             <!-- Reservation wrap-->
-            <div class="container bg-white p-4 border shadow-sm d-flex flex-wrap h-100">
+            <div class="container bg-light p-4 border shadow-sm d-flex flex-wrap h-100">
                 <!-- Header -->
                 <div class="row">
                     <h3 class="fw-bold">Reservaciones</h3>
                 </div>
-                {% for user_reservation in reservations %}
+                
                 <!-- Reservation body -->
-                <div class="row d-flex">
+                <div class="row d-flex" style="padding-top: 100px;">
+                    {% for user_reservation in reservations %}
                     <div class="container card mb-3 shadow-sm" style="max-width: 26rem;">
                         <div class="card-header bg-transparent">
                             <p><h6 class="fw-bold">Reservación {{ forloop.counter }}</h6></p>
