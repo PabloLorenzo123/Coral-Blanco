@@ -32,8 +32,7 @@ def create_reservation(request, r_adults, r_children, r_check_in_date, r_check_o
             check_in_date = r_check_in_date,
             check_out_date = r_check_out_date,
             )
-    
-    print("User cart created")
+    # print("User cart created")
     # Return the only reservation which isn't completed.
     return get_object_or_404(Reservation, user=request.user, completed=False)
 

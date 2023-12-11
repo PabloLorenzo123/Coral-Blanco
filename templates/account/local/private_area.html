@@ -11,7 +11,6 @@
                     <h1>Hola, {{ user.name }}!</h1>
                     <ul class="list-unstyled pt-4">
                         <li><b><h6>Reservaciones:</h6></b><h3 class="fst-normal">{{ user.stays }}</h3></li>
-                        <li><b><h6>Cancelaciones:</h6></b><h3 class="fst-normal">{{ user.cancelaciones }} 0</h3></li>
                     </ul>
                 <div class="row">
                     <a class="btn btn-success btn-lg mt-4" href="{% url 'update_user' user.uuid %}">Mi información</a>

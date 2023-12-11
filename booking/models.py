@@ -140,7 +140,7 @@ class Reservation(models.Model):
 
     # With the combination of an UUID and the guest name we'll create the identifier.
     reservation_confirmation_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    unique_identifier = models.CharField(max_length=70, null=True)
+    unique_identifier = models.CharField(max_length=70, null=True, unique=True)
 
     uuid = models.UUIDField(
         default = uuid.uuid4,
@@ -189,8 +189,9 @@ class Reservation(models.Model):
     completed = models.BooleanField(default=False)
 
     """This set's the reservation information, as its price, its taxes and calculates total price."""
-    def set_cart_info(self):
-         self.nights = (self.check_out_date - self.check_in_date).days - 1
+    def set_reservation_info(self):
+         self.nights = (self.check_out_date - self.check_in_date).days
+
          self.reservation_price = float(self.nights * self.room_type.price)
          self.taxes = float(self.reservation_price) * 0.20 # HERE DEFINE A TAXES CALCULATOR!
          self.total_price = self.reservation_price + self.taxes

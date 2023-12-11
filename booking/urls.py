@@ -15,4 +15,5 @@ urlpatterns = [
     
     path('mis_reservaciones/', MyReservations.as_view(), name='user_reservations'),
     path('reservation_detail/<uuid:uuid>/', ReservationDetail.as_view(), name='reservation_detail'),
+
 ]

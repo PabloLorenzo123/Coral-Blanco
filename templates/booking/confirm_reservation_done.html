@@ -1,11 +1,38 @@
 {% extends '_base.html' %}
 
-{% block title %}Tu estadia{% endblock title %}
+{% block title %}Reservación confirmada{% endblock title %}
 
 {% block content %}
-<p>Reservación exitosa: se ha enviado a tu correo {{user_reservation.guest.email}} todos los detalles de la reservación</p>
-<p>Identificador unico: {{user_reservation.unique_identifier}}</p>
-{% include 'booking/_stay.html' %}
+<div class="p-4 bg-light h-100">
+    <div class="row">
+        <!-- Contact info column -->
+        <div class="col-md-6">
+            <div class="container bg-white border rounded shadow-sm p-4">
+                <!-- Header Row -->
+                <div class="row">
+                    <h3 class="fw-bold">Reservación confirmada</h3>
+                </div>
+                <!-- Selected room -->
+                <div class="row">
+                    <div class="container">
+                        <p>Los detalles de la reservación fueron enviados a {{user_reservation.guest.email}}</p>
+                        <p>Identificador único: 
+                            <a href="{% url 'reservation_detail' user_reservation.uuid %}">{{user_reservation.unique_identifier}}</a></p>
+                    </div>
+                </div>
+
+                <!-- Dividing line -->
+                <hr>
+                
+            </div>
+        </div>
+
+        <!-- Reservation summary column-->
+        <div class="col-md-6">
+            {% include 'booking/_stay.html' %}
+        </div>
+    </div>
+</div>
 
 
 {% endblock content %}
