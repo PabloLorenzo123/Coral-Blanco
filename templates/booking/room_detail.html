@@ -64,8 +64,8 @@
                                     {% if forloop.counter <= 3 %}
                                         <li class="mb-4">
                                             <div class="d-flex align-items-center">
-                                                <i class="{{ feature.feature.icon }}" style="color: gray;"></i>
-                                                <p class="card-text mx-2">{{ feature.feature.feature }}</p>
+                                                <i class="{{ feature.feature_id.icon }}" style="color: gray;"></i>
+                                                <p class="card-text mx-2">{{ feature.feature_id }}</p>
                                             </div>
                                         </li>
                                     {% endif %}
@@ -76,8 +76,8 @@
                                     {% if forloop.counter >= 3 and forloop.counter < 6 %}
                                         <li class="mb-4">
                                             <div class="d-flex align-items-center">
-                                                <i class="{{ feature.feature.icon }}" style="color: gray;"></i>
-                                                <p class="card-text mx-2">{{ feature.feature.feature }}</p>
+                                                <i class="{{ feature.feature_id.icon }}" style="color: gray;"></i>
+                                                <p class="card-text mx-2">{{ feature.feature_id }}</p>
                                             </div>
                                         </li>
                                     {% endif %}
