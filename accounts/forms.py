@@ -35,6 +35,7 @@ class CustomSignupForm(SignupForm):
     last_name = forms.CharField(max_length=30, label='last Name')
     birthdate = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label='birthdate')
     country = forms.CharField(max_length=30, label='country')
+    phone_number = forms.CharField(max_length=10, label='telephone')
 
     class Meta:
         model = get_user_model()
@@ -46,6 +47,7 @@ class CustomSignupForm(SignupForm):
         user.last_name = self.cleaned_data['last_name']
         user.birthdate = self.cleaned_data['birthdate']
         user.country = self.cleaned_data['country']
+        user.phone_number = self.cleaned_data['phone_number']
         user.save()
         return user
 
