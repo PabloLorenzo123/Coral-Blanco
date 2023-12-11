@@ -6,7 +6,6 @@
 <div class="bg-light">
     <div class="row w-50 border p-4">
         <p>Reservaciones: {{ user.stays }}</p>
-        <p>Cancelaciones: 10</p>
     </div>
 </div>
 <div class="p-4 bg-light h-100">
@@ -17,6 +16,12 @@
         <div class="container card mb-3 shadow-sm" style="max-width: 26rem;">
             <div class="card-header bg-transparent">
                 <p><h6 class="fw-bold">Reservación {{ forloop.counter }}</h6></p>
+                <p>
+                    <h6 class="fw-bold">
+                        <a href="{% url 'reservation_detail' user_reservation.uuid %}"> ID: {{user_reservation.unique_identifier}}</a>
+                    </h6>
+                </p>
+                <p><h6 class="fw-light">Reservado en {{user_reservation.created_at}}</h6></p>
                 <div class="row">
                     <div class="col-md-6">
                         <p>Check-In</p>
