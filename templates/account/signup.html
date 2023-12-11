@@ -19,14 +19,14 @@
 
         <div class="form-group col-md-6">
            <!-- Dirección de email -->
-          <label>Email</label>
-          <input placeholder="Dirección de email" id="{{form.email.id_for_label}}" name="{{form.email.name}}" type="email"  class="form-control form-control-lg"/>
+          <label for="{{form.email.id_for_label}}">Email</label>
+          <input placeholder="ejemplo@email.com" id="{{form.email.id_for_label}}" name="{{form.email.name}}" type="email"  class="form-control form-control-lg" required/>
         </div>
 
         <div class="form-group col-md-6">
           <!-- Nombre -->
-          <label>Nombre</label>
-          <input type="text" class="form-control">
+          <label for="{{form.name.id_for_label}}">Nombre</label>
+          <input placeholder="nombre" id="{{form.name.id_for_label}}" name="{{form.name.name}}" type="text" class="form-control" required>
         </div>
 
       </div>
@@ -34,13 +34,13 @@
       <div class="row">
 
         <div class="form-group col md-6">
-          <label>Apellidos</label>
-          <input placeholder="Apellidos" id="{{form.last_name.id_for_label}}" name="{{form.last_name.name}}" type="text"  class="form-control form-control-lg"/>
+          <label for="{{form.last_name.id_for_label}}">Apellidos</label>
+          <input placeholder="Apellidos" id="{{form.last_name.id_for_label}}" name="{{form.last_name.name}}" type="text"  class="form-control form-control-lg" required/>
         </div>
 
         <div class="form-group col md-6">
-          <label>Telephone</label>
-          <input type="text" class="form-control">
+          <label for="{{form.phone_number.id_for_label}}">Teléfono</label>
+          <input placeholder="999-999-9999" id="{{form.phone_number.id_for_label}}" name="{{form.phone_number.name}}" type="number" class="form-control" req\>
         </div>
 
       </div>
@@ -49,16 +49,16 @@
 
         <div class="form-group col md-6">
           <!--Fecha de Nacimiento-->
-          <label>Fecha de nacimiento</label>
+          <label for="{{form.birthdate.id_for_label}}">Fecha de nacimiento</label>
           <input placeholder="Fecha de Nacimiento" id="{{form.birthdate.id_for_label}}" 
-          name="{{form.birthdate.name}}" type="date"  class="form-control form-control-lg"/>
+          name="{{form.birthdate.name}}" type="date"  class="form-control form-control-lg" required/>
         </div>
 
         <div class="form-group col md-6">
            <!--Pais-->
-          <label>País</label>
+          <label for="{{form.country.id_for_label}}">País</label>
           <select style="font-size: 16px" id="{{form.country.id_for_label}}"  name="{{form.country.name}}" 
-          type="{{form.country.field.widget.type}}"  class="form-control form-control-lg">
+          type="{{form.country.field.widget.type}}"  class="form-control form-control-lg" required>
             {% include '_countries.html' %}
           </select>
         </div>
@@ -68,9 +68,9 @@
       <div class="row">
         <!--Contraseña-->
         <div class="form-group col md-6">
-          <label>Contraseña</label>
+          <label for="{{form.password1.id_for_label}}">Contraseña</label>
           <input placeholder="Contraseña" id="{{form.password1.id_for_label}}" 
-          name="{{form.password1.name}}" type="password" class="form-control form-control-lg" />
+          name="{{form.password1.name}}" type="password" class="form-control form-control-lg" required />
         </div>
       
       <div class="form-group col md-6">
@@ -87,7 +87,18 @@
         </div>
 
       </div>
-
+      {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+              <strong>Error:</strong> Please correct the following issues and try again.
+                <ul>
+                  {% for field, error_list in form.errors.items %}
+                      {% for error in error_list %}
+                        <li>{{ field|title }}: {{ error }}</li>
+                      {% endfor %}
+                  {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
     </form>
   </div>
 </div>

@@ -30,15 +30,26 @@ class CustomUserChangeForm(UserChangeForm):
 # extend the standard signup form, and add it to settings.
 class CustomSignupForm(SignupForm):
 
-    email = forms.EmailField(max_length=255, label='Email')
-    name = forms.CharField(max_length=30, label='Name')
-    last_name = forms.CharField(max_length=30, label='Last Name')
-    birthdate = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label='Birthdate')
-    country = forms.CharField(max_length=30, label='Country')
+    email = forms.EmailField(max_length=255, label='email')
+    name = forms.CharField(max_length=30, label='name')
+    last_name = forms.CharField(max_length=30, label='last Name')
+    birthdate = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label='birthdate')
+    country = forms.CharField(max_length=30, label='country')
+    phone_number = forms.CharField(max_length=10, label='telephone')
 
     class Meta:
         model = get_user_model()
         fields = ('email', 'name', 'last_name', 'birthdate', 'country', 'password1', 'password2')
+    
+    def save(self, request):
+        user = super(CustomSignupForm, self).save(request)
+        user.name = self.cleaned_data['name']
+        user.last_name = self.cleaned_data['last_name']
+        user.birthdate = self.cleaned_data['birthdate']
+        user.country = self.cleaned_data['country']
+        user.phone_number = self.cleaned_data['phone_number']
+        user.save()
+        return user
 
 # THIS FORM IS NOT USED.
 class CustomUserCreationForm(UserCreationForm):
